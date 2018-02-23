@@ -1,4 +1,4 @@
-% INFO A LaTeX2e class for writing classy job applications. 
+% ABOUT A LaTeX2e class for writing classy job applications. 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{classycv}[2016/12/21 A LaTeX2e class for writing classy job applications.]
 
@@ -15,10 +15,10 @@
 \RequirePackage[utf8]{inputenc}
 \RequirePackage{pgfkeys}
 \RequirePackage[%
-	% NOTE This parameter has to be declared in order for `\loadgeometry` to actually change the layout.
-	%! showframe%
-	, pass%
+	% This parameter has to be set in order for `\loadgeometry` to actually change the layout.
+	pass%
 	, margin=0pt%
+%!  , showframe%
 ]{geometry}
 \RequirePackage{titleps}
 \RequirePackage{tikz}
@@ -28,12 +28,12 @@
 % HREF http://tex.stackexchange.com/a/46479
 \RequirePackage{varwidth}
 % NOTE Minipage like environment with customizable left and right margins
-%!ref http://tex.stackexchange.com/a/32707
+% HREF http://tex.stackexchange.com/a/32707
 \RequirePackage{changepage}
 % NOTE For `\getpagerefnumber` (extract number values from page labels).
 \RequirePackage{refcount}
 % NOTE For `\adjustbox` and `\marginbox`
-%!ref http://tex.stackexchange.com/a/28638
+% HREF http://tex.stackexchange.com/a/28638
 \RequirePackage{adjustbox}
 \RequirePackage{tabularx}
 \RequirePackage{color}
@@ -93,6 +93,9 @@
 \newlength{\classycv@@lIII}
 \setlength{\classycv@@lIII}{0pt}
 
+\newlength{\classycv@@lIV}
+\setlength{\classycv@@lIV}{0pt}
+
 % NOTE General purpose counter registers.
 \newcounter{classycv@@cI}
 \setcounter{classycv@@cI}{0}
@@ -143,8 +146,6 @@
 % COMMANDS %
 % % % % % % 
 
-\makeatletter
-
 % NOTE Font selection.
 \newcommand{\cmrfamily}{\fontfamily{cmr}\selectfont}
 \newcommand{\lmrfamily}{\fontfamily{lmr}\selectfont}
@@ -152,19 +153,21 @@
 \renewcommand{\robotofamily}{\fontfamily{Roboto-LF}\selectfont}
 \newcommand{\berafamily}{\fontfamily{fve}\selectfont}
 
+\makeatletter
+
 % NOTE Intersperse all characters within the second given string with the first given string.
 \newcommand{\classycv@intersperse}[2]{%
-	%! This should not be reached.
+	% This should not be reached.
 	\ifnum\pdf@strcmp{#2}{\@empty}=\z@%
 	\else%
-		%! Split at the first character.
+		% Split at the first character.
 		\StrSplit{#2}{1}{\classycv@a}{\classycv@b}%
-		%! Last character?
+		% Last character?
 		\ifnum\pdf@strcmp{\classycv@b}{\@empty}=\z@%
-			%! Yes: put last character.
+			% Yes: put last character.
 			\classycv@a%
 		\else%
-			%! No: intersperse and continue.
+			% No: intersperse and continue.
 			\classycv@a#1\classycv@intersperse{#1}{\classycv@b}%
 		\fi%
 	\fi%
@@ -176,23 +179,56 @@
 % #1: (optional) Tikz arguments.
 % #2: (mandatory) Text to be wrapped.
 %%
-\newcommand{\classycv@wrapWithCircle}[2][]{%
+\newcommand{\classycv@DrawCircle}[2][]{%
 	% Were optional arguments given?
-	\ifnum\pdf@strcmp{#1}{\@empty}=\z@%
-		% No: don't pass to node.
-		\tikz[baseline=(char.base)]{\node[inner sep=1pt, draw, circle, thick] (char) {#2};}
-	\else%
-		% Yes: pass to node.
-		\tikz[baseline=(char.base)]{\node[inner sep=1pt, draw, circle, draw, thick, #1] (char) {#2};}
-	\fi%
+	\pgfkeys{/classycv/data/draw circle/options/.cd, #1}%
+	\pgfkeys{%
+		/classycv/data/draw circle/options/.cd%
+		, height/.get=\height%
+		, border width/.get=\borderWidth%
+		, border color/.get=\borderColor%
+		, background color/.get=\bg%
+		, text color/.get=\textColor%
+		, padding/.get=\padding%
+	}%
+	\edef\@@bg{\ifnum\pdf@strcmp{\@empty}{\bg}=\z@ none\else\bg\fi}%
+	% Calculate text height/text width, depth and radius.
+	\setlength{\classycv@@lI}{\dimexpr\height-\dimexpr\padding+\padding\relax-\dimexpr\borderWidth+\borderWidth\relax\relax}%
+	\setlength{\classycv@@lII}{\dimexpr0.34\height\relax}%
+	\setlength{\classycv@@lIII}{\dimexpr0.5\dimexpr\height-\dimexpr\borderWidth+\borderWidth\relax}%
+	\setlength{\classycv@@lIV}{\dimexpr\borderWidth\relax}
+	% Shift the circled text down s.t. the circled text's base line and the text base line are aligned.
+	\adjustbox{raise=-\classycv@@lII, height=\height, margin=0, padding=0}{%
+		\tikz {%
+			\draw[%
+				use as bounding box%
+				, inner sep=0pt%
+				, outer sep=0pt%
+				, draw=none%
+				% DEBUG uncomment to see border of bounding box.
+				%!, draw=black%
+			] rectangle (\height, \height);%
+			% TODO centering is not perfect.
+			\draw[line width=\borderWidth, draw=\borderColor, fill=\@@bg] (current bounding box.center) circle (\classycv@@lIII);%
+			% DEBUG uncomment to see text node baseline.
+			%!, \draw[draw=red] (0, \classycv@@lII) rectangle (\height, \classycv@@lII);%
+			\node[%
+				, below right=\classycv@@lIV and \classycv@@lIV of current bounding box.north west% 
+				, inner sep=\padding%
+				, outer sep=0pt%
+				, draw=none%
+				% DEBUG uncomment to see border of text node.
+				%!, draw=green%
+				, align=center%
+				, text width=\classycv@@lI%
+				, text depth=\dimexpr0.34\classycv@@lI\relax%\classycv@@lI\relax%\dimexpr\classycv@@lII\relax%
+				, text height=\dimexpr0.66\classycv@@lI\relax%\classycv@@lI\relax%\dimexpr0.66\classycv@@lI\relax%
+			] {%
+				\ifnum\pdf@strcmp{\@empty}{\textColor}=\z@\else\expandafter\color\expandafter{\textColor}\fi{#2}%
+			}%
+		}%
+	}%
 }
-
-% TODO remove?
-\iffalse
-\newcommand*\circled[1]{%
-	\tikz[baseline=(char.base)]{\node[shape=circle,draw,inner sep=2pt] (char) {#1};}%
-}
-\fi
 
 %%
 % Wrap the given argument in a hexagon.
@@ -239,7 +275,9 @@
 
 % NOTE Constants.
 \newcommand{\classycv@FORMAT@COVERLETTER@DINLETTERA}{din-5008-a}
-\newcommand{\classycv@FORMAT@RESUME@THIRTYSEVENTY}{thirty-seventy}
+\newcommand{\classycv@FORMAT@COVERLETTER@USBLOCK}{us-block}
+\newcommand{\classycv@FORMAT@RESUME@CLASSIC}{classic}
+\newcommand{\classycv@FORMAT@RESUME@MODERN}{modern}
 
 % NOTE Public interface.
 
@@ -250,6 +288,7 @@
 % #2: (mandatory) Value
 %%
 \providecommand{\classycvSet}[2]{\pgfkeyssetvalue{/classycv/data#1}{#2}}
+
 %%
 % Get classycv data.
 %
@@ -257,6 +296,7 @@
 % #2: (mandatory) The macro to store the value in.
 %%
 \providecommand{\classycvGet}[2]{\pgfkeysvalueof{/classycv/data#1}}
+
 %%
 % Clear classycv data.
 %
@@ -304,16 +344,21 @@
 	\ifnum\pdf@strcmp{\classycv@format}{\classycv@FORMAT@COVERLETTER@DINLETTERA}=\z@%
 		% DIN 5008 A format.
 		\begin{classycv@PutCoverLetterDINLetterA}[#1]{#2}{#3}{#4}{#5}{#6}%
+	\else\ifnum\pdf@strcmp{\classycv@format}{\classycv@FORMAT@COVERLETTER@USBLOCK}=\z@%
+		% US business letter block format
+		\begin{classycv@PutCoverLetterUsBlock}[#1]{#2}{#3}{#4}{#5}{#6}%
 	\else%
 		% Invalid letter format.
 		\ClassWarning{classycv}{(!) undefined letter format (\classycv@format)}%
-	\fi%
+	\fi\fi%
 }{%
 	% Close cover letter environment.
 	\pgfkeys{/classycv/data/settings/cover letter/format/.get=\classycv@format}%
 	\ifnum\pdf@strcmp{\classycv@format}{\classycv@FORMAT@COVERLETTER@DINLETTERA}=\z@%
 		\end{classycv@PutCoverLetterDINLetterA}%
-	\fi%
+	\else\ifnum\pdf@strcmp{\classycv@format}{\classycv@FORMAT@COVERLETTER@USBLOCK}=\z@%
+		\end{classycv@PutCoverLetterUsBlock}%
+	\fi\fi%
 	% Label the last page (to be able to calculate the page count).
 	\label{cover-letter-\theclassycv@coverLetterCounter-last-page}%
 	% Reset cover letter flag.
@@ -331,6 +376,7 @@
 	\ifresume\errmessage{Terminal error: detected invalid nested resume environment}\else\fi%
 	\resumetrue%
 	% Define aliases for resume components.
+	\LetLtxMacro\circle\classycv@DrawCircle%
 	\LetLtxMacro\semicircle\classycv@PutSemicircle%
 	\LetLtxMacro\doughnut\classycv@PutDoughnutChart%
 	\LetLtxMacro\progress\classycv@PutProgressBar%
@@ -344,20 +390,28 @@
 	\LetLtxMacro{\endList}\endclassycv@PutList%
 	% Switch for resume format.
 	\pgfkeys{/classycv/data/settings/resume/format/.get=\classycv@format}%
-	\ifnum\pdf@strcmp{\classycv@format}{\classycv@FORMAT@RESUME@THIRTYSEVENTY}=\z@%
-		% Thirty Seventy resume format.
-		\begin{classycv@PutResumeThirtySeventy}[#1]{#2}%
+	\ifnum\pdf@strcmp{\classycv@format}{\classycv@FORMAT@RESUME@CLASSIC}=\z@%
+		% Classic resume format.
+		\begin{classycv@PutResumeClassic}[#1]{#2}%
+	\else%
+	\ifnum\pdf@strcmp{\classycv@format}{\classycv@FORMAT@RESUME@MODERN}=\z@%
+		% Modern resume format.
+		\begin{classycv@PutResumeModern}[#1]{#2}%
 	\else%
 		% Invalid resume format.
 		\ClassWarning{classycv}{! undefined letter format (\classycv@format)}%
-	\fi%
+	\fi\fi%
 }{%
 	% Close resume environment.
 	\pgfkeys{/classycv/data/settings/resume/format/.get=\classycv@format}%
-	\ifnum\pdf@strcmp{\classycv@format}{\classycv@FORMAT@RESUME@THIRTYSEVENTY}=\z@%
-		% Thirty Seventy resume format.
-		\end{classycv@PutResumeThirtySeventy}%
-	\fi%
+	\ifnum\pdf@strcmp{\classycv@format}{\classycv@FORMAT@RESUME@CLASSIC}=\z@%
+		% Classic resume format.
+		\end{classycv@PutResumeClassic}%
+	\else
+	\ifnum\pdf@strcmp{\classycv@format}{\classycv@FORMAT@RESUME@MODERN}=\z@%
+		% Modern resume format.
+		\end{classycv@PutResumeModern}%
+	\fi\fi%
 	% Reset resume flag.
 	\resumefalse%
 }
@@ -398,7 +452,7 @@
 	\egroup%
 }
 
-%! NOTE private interface
+% NOTE private interface
 
 %%
 % Draw the component for the given identifier.
@@ -433,12 +487,12 @@
 		, skip above/.get=\skipAbove%
 		, skip below/.get=\skipBelow%
 	}%	
-	\vspace*{\skipAbove}\par%
+	\ifdim\skipAbove=0pt\else\vspace*{\skipAbove}\par\fi%
 	\tikz{
 		\draw[use as bounding box, draw=none, inner sep=0pt] rectangle (\width, \height);%
 		\path[draw, line width=\strength, color=#2] (current bounding box.west) -- (current bounding box.east);%
 	}%
-	\vspace*{\skipBelow}\par%
+	\ifdim\skipBelow=0pt\else\vspace*{\skipBelow}\par\fi%
 	\egroup%
 }
 
@@ -447,6 +501,8 @@
 %
 % #1: (optional) Command options.
 % #2: (mandatory) Completion percentage.
+%
+% TODO progress bar is not properly aligned if a non-zero border is specified.
 %%
 \providecommand{\classycv@PutProgressBar}[2][]{%
 	\bgroup%
@@ -458,7 +514,7 @@
 		, foreground color/.get=\foregroundColor%
 		, border width/.get=\borderWidth%
 		, border color/.get=\borderColor%
-		, bar width/.get=\barWidth%
+		, width/.get=\width%
 		, has label/.get=\hasLabel%
 		, label width/.get=\labelWidth%
 		, label position/.get=\labelPosition%
@@ -468,9 +524,11 @@
 		, label text align/.get=\labelTextAlign%
 		, skip between/.get=\skipBetween%
 	}%
-	\setlength{\classycv@@lI}{\barWidth}%
+	% Calculate the width and height of the progress bar foreground (the visible completion).
+	\setlength{\classycv@@lI}{\width}%
 	\divide\classycv@@lI by 100\relax%
 	\multiply\classycv@@lI by #2\relax%
+	\setlength{\classycv@@lII}{\height-\dimexpr\borderWidth\relax}
 	\begin{tikzpicture}%
 		\ifnum\pdf@strcmp{yes}{\hasLabel}=\z@%
 			\ifnum\pdf@strcmp{left}{\labelPosition}=\z@%
@@ -486,16 +544,16 @@
 						, text=\labelColor%
 						, align=\labelTextAlign] (label) {\labelText};%
 					\coordinate (P1) at ($([shift={(\skipBetween, 0)}]label.south east)$);%
-					\draw[text width=, line width=\borderWidth, draw=\borderColor, fill=\backgroundColor] (P1) rectangle +(\barWidth, \height);%
+					\draw[text width=, line width=\borderWidth, draw=\borderColor, fill=\backgroundColor] (P1) rectangle +(\width, \height);%
 				\end{pgfonlayer}%
 				\begin{pgfonlayer}{main}%
 					\coordinate (P2) at ($([shift={(\skipBetween + \borderWidth, \borderWidth)}]label.south east)$);%
-					\draw[draw=none, fill=\foregroundColor] (P2) rectangle +(\classycv@@lI, \height);%
+					\draw[draw=none, fill=\foregroundColor] (P2) rectangle +(\classycv@@lI, \classycv@@lII);%
 				\end{pgfonlayer}%
 			\else%
 				\begin{pgfonlayer}{background}%
-					\draw[text width=, line width=\borderWidth, draw=\borderColor, fill=\backgroundColor] (0, 0) rectangle +(\barWidth, \height);%
-					\coordinate (P1) at (\barWidth, 0);%
+					\draw[text width=, line width=\borderWidth, draw=\borderColor, fill=\backgroundColor] (0, 0) rectangle +(\width, \height);%
+					\coordinate (P1) at (\width, 0);%
 					\coordinate (P2) at ($([shift={(\skipBetween, 0)}]P1.south east)$);%
 					\node[%
 						above right=0pt and 0pt of P2%
@@ -509,10 +567,16 @@
 						, align=\labelTextAlign] (label) {\labelText};%
 				\end{pgfonlayer}%
 				\begin{pgfonlayer}{main}%
-					\draw[draw=none, fill=\foregroundColor] (\borderWidth, \borderWidth) rectangle +(\classycv@@lI, \height);%
+					\draw[draw=none, fill=\foregroundColor] (\borderWidth, \borderWidth) rectangle +(\classycv@@lI, \classycv@@lII);%
 				\end{pgfonlayer}%
 			\fi%
 		\else%
+			\begin{pgfonlayer}{background}%
+				\draw[text width=, line width=\borderWidth, draw=\borderColor, fill=\backgroundColor] (0, 0) rectangle +(\width, \height);%
+			\end{pgfonlayer}%
+			\begin{pgfonlayer}{main}%
+				\draw[draw=none, fill=\foregroundColor] (\borderWidth, \borderWidth) rectangle +(\classycv@@lI, \classycv@@lII);%
+			\end{pgfonlayer}%
 		\fi%
 	\end{tikzpicture}%
 	\egroup%
@@ -546,30 +610,29 @@
 	\tikz{%	
 		\pgfmathsetmacro\arcLength{(#2/100)*360}%
 		\pgfmathsetmacro\endDegree{Mod(\arcLength, 360)}%
-		%! Normalize to 360 degrees if `\arcLength` is any multiple of 360 greater than 0.
+		% Normalize to 360 degrees if `\arcLength` is any multiple of 360 greater than 0.
 		\ifnum0 = \endDegree\relax%
 			\ifnum0 < #2\relax%
 				\pgfmathsetmacro\endDegree{360}%
 			\fi%
 		\fi%
 		\setlength{\classycv@@lI}{\dimexpr0.5\size\relax}%
-%		\draw[black, use as bounding box] rectangle (\size, \size);%
 		\begin{pgfonlayer}{main}
 		    \draw[use as bounding box, draw=\lineColor, fill=\fillColor, rotate=270, line width=\strength] (0, 0) arc (0:\endDegree:\size);%
 		\end{pgfonlayer}{main}
-		%! Draw a glow effect?
+		% Draw a glow effect?
 		\ifnum\pdf@strcmp{yes}{\drawGlow}=\z@%
 			\begin{pgfonlayer}{background}
 			    \draw[draw=none, fill=none, circular glow={fill=light-gray!50!nearly-white}, rotate=270] (0, 0) arc (0:360:\size);%
 			\end{pgfonlayer}%
 		\fi%
-		%! Draw complement?
+		% Draw complement?
 		\ifnum\pdf@strcmp{yes}{\drawComplement}=\z@%
 			\begin{pgfonlayer}{overlay 1}
 				\draw[draw=\complementLineColor, fill=\fillColor, line width=\strength, rotate=270] (0, 0) arc (360:\endDegree:\size);			
 		    \end{pgfonlayer}%
 		\fi%
-		%! Draw label?
+		% Draw label?
 		\ifnum\pdf@strcmp{yes}{\hasLabel}=\z@%
 			\begin{pgfonlayer}{overlay 2}%
 			    \node[draw=none, minimum size=\size, text width=, text=\labelColor, font=\labelFont] at (current bounding box.center) {\labelText};%
@@ -637,44 +700,43 @@
 		/classycv/data/put heading/options/.cd%
 		, width/.get=\width%
 		, height/.get=\height%
-		, has label/.get=\hasLabel%
-		, label shape/.get=\labelShape%
-		, label color/.get=\labelColor%
-		, label frame color/.get=\labelFrameColor%
-		, label frame width/.get=\labelFrameWidth%
-		, label inner sep/.get=\labelInnerSep%
-		, label position/.get=\labelPosition%
-		, label text/.get=\labelContent%
-		, label text color/.get=\labelTextColor%
+		, border width/.get=\borderWidth%
+		, border color/.get=\borderColor%
+		, sharp corners/.get=\sharpCorners%
+		, foreground color/.get=\fg%
+		, background color/.get=\bg%
 		, basic style/.get=\basicStyle%
-		, text color/.get=\textColor%
+		, text align/.get=\textAlign%
 		, skip above/.get=\skipAbove%
+		, skip right/.get=\skipRight%
 		, skip below/.get=\skipBelow%
-		, skip between/.get=\skipBetween%
+		, skip left/.get=\skipLeft%
+		, padding/.get=\padding%
 	}%
-	\vspace*{\skipAbove}\par%
-	\basicStyle%
-	\setlength{\classycv@@lI}{\dimexpr\labelInnerSep+\labelFrameWidth\relax}%
-	\tikz[baseline=(text.base)]{%
-		\draw[use as bounding box, draw=none] rectangle (\width, \height);%
-		% Is a label required?
-		\ifnum\pdf@strcmp{yes}{\hasLabel}=\z@%
-			% Is the label left or right?
-			\ifnum\pdf@strcmp{left}{\labelPosition}=\z@%
-				\node[right=\classycv@@lI of current bounding box.west, inner sep=\labelInnerSep, text width=, \labelShape, line width=\labelFrameWidth, draw=\labelFrameColor, fill=\labelColor, align=center, font={\smaller[2]}, text=\labelTextColor] (label) {\labelContent};%
-				\node[
-					right=\skipBetween of label.east%
-					, text width=%
-				] (text) {\expandafter\color\expandafter{\textColor}#2};%
-			\else%
-				\node[right=0pt of current bounding box.west, text width=] (text) {\expandafter\color\expandafter{\textColor}#2};%
-				\node[right=\skipBetween of text.east, inner sep=\labelInnerSep, text width=, \labelShape, line width=\labelFrameWidth, draw=\labelFrameColor, fill=\labelColor, align=center, font={\smaller[2]}, text=\labelTextColor] (label) {\labelContent};%
-			\fi%
-		\else%
-			\node[below right=0pt and 0pt of current bounding box.north west] (text) {\expandafter\color\expandafter{\textColor}#2};%
-		\fi%
-	}%
-	\vspace*{\skipBelow}\par%
+	\begin{tcolorbox}[%
+		boxrule=\borderWidth%
+		, colframe=\borderColor%
+		, enlarge top by=\skipAbove%
+		, grow to right by=-\skipRight%
+		, enlarge bottom by=\skipBelow%
+		, grow to left by=-\skipLeft%
+		% NOTE "top", ..., "left" are added to "boxsep" value for padding calculation
+		, top=0pt%
+		, right=0pt%
+		, bottom=0pt%
+		, left=0pt%
+		, boxsep=\padding%
+		, width=\width%
+		, colback=\bg%
+		, halign=\textAlign%
+		, enlarge top by=\skipAbove%
+		, enlarge bottom by=\skipBelow%
+		, sharp corners=\sharpCorners%
+	]%
+		\ifnum\pdf@strcmp{\@empty}{\fg}=\z@\else%
+		\expandafter\color\expandafter{\fg}\fi%
+		\basicStyle{#2}%
+	\end{tcolorbox}%
 	\egroup%
 }
 
@@ -692,19 +754,16 @@
 		, basic style/.get=\basicStyle%
 		, column format/.get=\columnFormat%
 		, stretch/.get=\stretch%
-%		, alignment/.get=\alignment$
 		, skip above/.get=\skipAbove%
 		, skip below/.get=\skipBelow%
 	}%
-	\vspace*{\skipAbove}\par%
+	\ifdim\skipAbove=0pt\else\vspace*{\skipAbove}\par\fi%
 	\basicStyle%
 	\renewcommand{\arraystretch}{\stretch}%
-	%! begin tabular
 	\expandafter\tabular\expandafter{\columnFormat}%
 }{%
-	%! end tabular
 	\endtabular%
-	\vspace*{\skipBelow}\par%
+	\ifdim\skipBelow=0pt\else\vspace*{\skipBelow}\par\fi%
 	\egroup%
 }
 
@@ -723,7 +782,7 @@
 		, skip above/.get=\skipAbove%
 		, skip below/.get=\skipBelow%
 	}%
-	\vspace*{\skipAbove}\par%
+	\ifdim\skipAbove=0pt\else\vspace*{\skipAbove}\par\fi%
 	\basicStyle%
 	% Draw the itemize list.
 	\begin{itemize}%
@@ -732,7 +791,7 @@
 		\setlength{\parsep}{0pt}%
 }{%
 	\end{itemize}%
-	\vspace*{\skipBelow}\par%
+	\ifdim\skipBelow=0pt\else\vspace*{\skipBelow}\par\fi%
 	\egroup%
 }
 
@@ -762,13 +821,13 @@
 		, skip between/.get=\skipBetween%
 		, skip below/.get=\skipBelow%
 	}%
-	\vspace*{\skipAbove}\par%
+	\ifdim\skipAbove=0pt\else\vspace*{\skipAbove}\par\fi%
 	\basicStyle%
 	{\dateLineStyle{#2}\par}%
 	{\topicLineStyle{#3}\par}%
-	\vspace*{\skipBetween}\par%
+	\vspace*{\skipBetween}%
 }{%
-	\vspace*{\skipBelow}\par%
+	\ifdim\skipBelow=0pt\\\else\vspace*{\skipBelow}\par\fi%
 	\egroup%
 }
 
@@ -860,6 +919,7 @@
 		% Draw closing component
 		\classycv@PutComponent{/cover letter/closing}%
 	\end{adjustwidth}%
+	% TODO remove `\vspace` if not necessary.
 	\vspace*{\fill}%
 	\clearpage%
 	\egroup%
@@ -933,12 +993,12 @@
 						\renewcommand{\arraystretch}{1.25}%
 						\begin{tabular}[t]{L{0.5\dimexpr\linewidth-2\tabcolsep\relax} L{0.5\dimexpr\linewidth-2\tabcolsep\relax}}%
 							\begin{tabular}[t]{C{2.5em} l}
-								\ifnum\pdf@strcmp{\phone}{\empty}=\z@\else{\large\Telefon}&\phone\\\fi%
-								\ifnum\pdf@strcmp{\mobile}{\empty}=\z@\else{\large\faMobile}&\mobile\fi%
+								\ifnum\pdf@strcmp{\phone}{\@empty}=\z@\else{\large\Telefon}&\phone\\\fi%
+								\ifnum\pdf@strcmp{\mobile}{\@empty}=\z@\else{\large\faMobile}&\mobile\fi%
 							\end{tabular}% 
 							& \begin{tabular}[t]{C{2.5em} l}%
-								\ifnum\pdf@strcmp{\email}{\empty}=\z@\else{\large\Letter}&\email\\\fi%
-								\ifnum\pdf@strcmp{\website}{\empty}=\z@\else{\large\ComputerMouse}&\website\fi%
+								\ifnum\pdf@strcmp{\email}{\@empty}=\z@\else{\large\Letter}&\email\\\fi%
+								\ifnum\pdf@strcmp{\website}{\@empty}=\z@\else{\large\ComputerMouse}&\website\fi%
 							\end{tabular}%
 						\end{tabular}%
 					}%
@@ -958,11 +1018,12 @@
 		/classycv/data/cover letter/DIN 5008 A/options/.cd%
 		, has footer separator/.get=\hasFooterSeparator%
 		, has page counter/.get=\hasPageCounter%
-		, footer style/.get=\style
+		, footer style/.get=\style%
+		, footer foreground color/.get=\fg%
 	}%
 	\pgfkeys{/classycv/data/cover letter/DIN 5008 A/submitter/attachments/.get=\attachments}%
 	% Draw component.
-	\begin{tikzpicture}
+	\begin{tikzpicture}%
 		\draw[draw=none, use as bounding box] rectangle (\textwidth, 42mm);
 		% Draw optional footer separator.
 		\ifnum\pdf@strcmp{yes}{\hasFooterSeparator}=\z@%
@@ -972,11 +1033,11 @@
 		\fi%
 		% Draw footer content node.
 		\node[below right=\dimexpr4.23mm + \baselineskip\relax and 25mm of current bounding box.north west, text width=\dimexpr\textwidth - 45mm\relax, inner sep=0pt, outer sep=0pt] (footer) {%
-			\style%
+			\expandafter\color\expandafter{\fg}\style\bgroup%
 			\ifnum\pdf@strcmp{yes}{\hasPageCounter}=\z@%
 				\begin{tabular}[t]{L{0.9\linewidth-2\tabcolsep} R{0.1\linewidth-2\tabcolsep}}%
 					% Draw attachments.
-						\ifnum\pdf@strcmp{\attachments}{\empty}=\z@\else%
+						\ifnum\pdf@strcmp{\attachments}{\@empty}=\z@\else%
 							\setcounter{classycv@@cI}{\the\numexpr\getpagerefnumber{cover-letter-\theclassycv@coverLetterCounter-last-page}-1}%
 							\ifnum\thepage=\theclassycv@@cI%
 								\faFilesO~~\attachments%
@@ -986,15 +1047,16 @@
 						\theclassycv@coverLetterPageCounter~|~\the\numexpr\getpagerefnumber{cover-letter-\theclassycv@coverLetterCounter-last-page}-\getpagerefnumber{cover-letter-\theclassycv@coverLetterCounter-first-page}%
 				\end{tabular}%
 			\else%
-				\ifnum\pdf@strcmp{\attachments}{\empty}=\z@\else%
+				\ifnum\pdf@strcmp{\attachments}{\@empty}=\z@\else%
 					\setcounter{classycv@@cI}{\the\numexpr\getpagerefnumber{cover-letter-\theclassycv@coverLetterCounter-last-page}-1}%
 					\ifnum\thepage=\theclassycv@@cI%
 						\stackbox[l]{\faFilesO~~\attachments}%
 					\fi%
 				\fi%
 			\fi%
+			\egroup%
 		};%
-	\end{tikzpicture}
+	\end{tikzpicture}%
 	\egroup%
 }
 
@@ -1168,7 +1230,7 @@
 	\bgroup%
 	\pgfkeys{/classycv/data/cover letter/DIN 5008 A/submitter/attachments/.get=\attachments}
 	% Were attachments given?
-	\ifnum\pdf@strcmp{\attachments}{\empty}=\z@\else%
+	\ifnum\pdf@strcmp{\attachments}{\@empty}=\z@\else%
 		% Yes: put attachments line.
 		\pgfkeys{/classycv/data/cover letter/DIN 5008 A/options/attachments style/.get=\attachmentsStyle}%
 		\vfill%
@@ -1177,103 +1239,380 @@
 	\egroup%
 }
 
-% TODO remove?
-\iffalse
+%%
+% Draw a cover letter conforming to US business letter format in block format.
 %
-%! Fourty Sixty resume format.
-%
-\newenvironment{classycv@PutResumeFourtySixty}[2][]{%
+% #1, #2, #3, #4, #5, #6: see environment "CoverLetter".
+%%
+\newenvironment{classycv@PutCoverLetterUsBlock}[6][]{%
 	\bgroup%
-	%! Set data
-	\pgfkeys{/classycv/data/resume/Fourty Sixty/options/.cd, #1}
-	\pgfkeys{/classycv/data/resume/Fourty Sixty/.cd, #2}%
-	%! Define default components
-	\@ifundefined{/classycv/components/resume/picture}{\classycvDefineComponent{/resume/picture}{\classycv@PutResumeFourtySixty@pictureComponent}}{}
-	\@ifundefined{/classycv/components/resume/title}{\classycvDefineComponent{/resume/title}{\classycv@PutResumeFourtySixty@titleComponent}}{}
-	\@ifundefined{/classycv/components/resume/content}{\classycvDefineComponent{/resume/title}{\classycv@PutResumeFourtySixty@titleComponent}}{}%	
-	%! Set geometry and page style
-	\loadgeometry{blank}%
-	\pagestyle{blank}
-	%! Set indentation to zero.
+	% Set data.
+	\pgfkeys{/classycv/data/cover letter/us block/options/.cd, #1}
+	\pgfkeys{/classycv/data/cover letter/us block/submitter/.cd, #2}
+	\pgfkeys{/classycv/data/cover letter/us block/recipient/.cd, #3}
+	\pgfkeys{%
+		/classycv/data/cover letter/us block/.cd%
+		, subject={#4}%
+		, opening={#5}%
+		, closing={#6}%
+	}%
+	\pgfkeys{/classycv/data/cover letter/us block/options/content style/.get=\contentStyle}%
+	% Define default components (non empty header component will raise warning).
+	\@ifundefined{/classycv/components/cover letter/header}{\classycvDefineComponent{/cover letter/header}{}}{\ClassWarning{classycv}{(!) This letter format does not support a header component}}%
+	\@ifundefined{/classycv/components/cover letter/footer}{\classycvDefineComponent{/cover letter/footer}{\classycv@PutCoverLetterUsBlock@footerComponent}}{}%
+	\@ifundefined{/classycv/components/cover letter/submitter information}{\classycvDefineComponent{/cover letter/submitter information}{\classycv@PutCoverLetterUsBlock@submitterInformationComponent}}{}%
+	\@ifundefined{/classycv/components/cover letter/date}{\classycvDefineComponent{/cover letter/date}{\classycv@PutCoverLetterUsBlock@dateComponent}}{}%
+	\@ifundefined{/classycv/components/cover letter/recipient information}{\classycvDefineComponent{/cover letter/recipient information}{\classycv@PutCoverLetterUsBlockA@recipientInformationComponent}}{}%
+	\@ifundefined{/classycv/components/cover letter/opening}{\classycvDefineComponent{/cover letter/opening}{\classycv@PutCoverLetterUsBlock@openingComponent}}{}%
+	\@ifundefined{/classycv/components/cover letter/subject}{\classycvDefineComponent{/cover letter/subject}{\classycv@PutCoverLetterUsBlock@subjectComponent}}{}%
+	\@ifundefined{/classycv/components/cover letter/closing}{\classycvDefineComponent{/cover letter/closing}{\classycv@PutCoverLetterUsBlock@closingComponent}}{}%
+	% Set page geometry and style.
+	\loadgeometry{us-business-cover-letter}%
+	\pagestyle{cover-letter}%
+	% Set paragraph indentation to zero
 	\setlength{\parindent}{0pt}%
-	%! 
-	\begin{minipage}[t]{0.4\paperwidth}
-%
-%!todo: content
-%
-	\end{minipage}%
-	%! put right page side
-	\begin{minipage}[t]{0.6\paperwidth}%
-    %! Put title
-    \classycv@PutComponent{/resume/title}%
+	% Draw components.
+	\begin{adjustwidth}{0pt}{0pt}%
+		\classycv@PutComponent{/cover letter/submitter information}%
+		\classycv@PutComponent{/cover letter/date}%
+		\classycv@PutComponent{/cover letter/recipient information}%
+		\classycv@PutComponent{/cover letter/opening}%
+		\classycv@PutComponent{/cover letter/subject}%
+		% Insert a blank line.
+		\vspace*{\baselineskip}\par
+		\bgroup%
+			\contentStyle%
 }{%
-	\end{minipage}%
-	%! Restore geometry, page style
-	\clearpage
-	\restoregeometry%
-	\pagestyle{blank}%
-	%! Restore indentation.
-	\setlength{\parindent}{\classycv@parindent@default}%
-	%! Clear page
-	% NOTE `\clearpage` is necessary for geometry and page style to be applied
-	%!ref: http://tex.stackexchange.com/a/115418
+		\egroup%
+		\classycv@PutComponent{/cover letter/closing}%
+	\end{adjustwidth}%
 	\clearpage%
 	\egroup%
 }
 
-\newcommand{\classycv@PutResumeFourtySixty@pictureComponent}{%
-	%! Get data
-	\pgfkeys{/classycv/data/resume/Fourty Sixty/picture/.get=\picture}%
-	%! Put component
-	\adjustbox{margin=10mm 0pt 0pt 10mm, minipage={\linewidth-10mm}}{%
-		\ifnum\pdf@strcmp{\picture}{\@empty}=\z@%
-		\else%
-			\adjustbox{minipage={\linewidth}, bgcolor=light-gray}{%
-				\begin{center}%
-					\includegraphics[width=0.5\linewidth, keepaspectratio]{\picture}%
-				\end{center}%
-			}%
-		\fi%
+%%
+% Default US cover letter block format footer component.
+%%
+\newcommand{\classycv@PutCoverLetterUsBlock@footerComponent}{%
+	\bgroup%
+	\pgfkeys{%
+		/classycv/data/cover letter/us block/options/.cd%
+		, has footer separator/.get=\hasFooterSeparator%
+		, has page counter/.get=\hasPageCounter%
+		, footer style/.get=\style
 	}%
-	\vspace*{24pt}\par%
+	\pgfkeys{/classycv/data/cover letter/us block/submitter/attachments/.get=\attachments}%
+	% Draw component.
+	\begin{tikzpicture}
+		\draw[draw=none, use as bounding box, inner sep=0pt, outer sep=0pt] rectangle (\textwidth, \classycv@GEOMETRY@USBLOCK@FOOTERHEIGHT);
+		% Draw footer content node.
+		\node[below right=0pt and 0pt of current bounding box.north west, inner sep=0pt, outer sep=0pt, text width=\textwidth, text height=0.66\classycv@GEOMETRY@USBLOCK@FOOTERHEIGHT, text depth=0.34\classycv@GEOMETRY@USBLOCK@FOOTERHEIGHT] (footer) {%
+			\style%
+			% Was a list of attachments provided?
+			\ifnum\pdf@strcmp{\attachments}{\@empty}=\z@%
+			\else%
+				% Yes: draw attachments if this is the last page.
+				\setcounter{classycv@@cI}{\the\numexpr\getpagerefnumber{cover-letter-\theclassycv@coverLetterCounter-last-page}-1}%
+				\ifnum\thepage=\theclassycv@@cI%
+					\faFilesO~~\attachments%
+				\fi%
+			\fi%
+			% Draw page counter if enabled.
+			\ifnum\pdf@strcmp{no}{\hasPageCounter}=\z@%
+			\else%
+				\hfill\theclassycv@coverLetterPageCounter~|~\the\numexpr\getpagerefnumber{cover-letter-\theclassycv@coverLetterCounter-last-page}-\getpagerefnumber{cover-letter-\theclassycv@coverLetterCounter-first-page}%
+			\fi%
+		};%
+	\end{tikzpicture}
+	\egroup%
 }
-
-\newcommand{\classycv@PutResumeFourtySixty@titleComponent}{%
-	%! Get data
-	\pgfkeys{/classycv/data/resume/Thirty Seventy/name/.get=\name}%
-	%! Put component
-	\Huge\color{nearly-white}\MakeUppercase{\name}\par%
-	%! Put delimiter
-	\classycv@Resume@PutDelimiter{nearly-white}%
-}
-\fi
 
 %%
-% Thirty Seventy resume format.
+% Default sender information component for a US business letter in block format.
+%%
+\newcommand{\classycv@PutCoverLetterUsBlock@submitterInformationComponent}{%
+	\bgroup%
+	\pgfkeys{%
+		/classycv/data/cover letter/us block/options/.cd%
+		, submitter information basic style/.get=\basicStyle%
+		, submitter information address style/.get=\addressStyle%
+		, submitter information organisation style/.get=\organisationStyle%
+		, submitter information phone style/.get=\phoneStyle%
+		, submitter information email style/.get=\emailStyle%
+	}%
+	\pgfkeys{%
+		/classycv/data/cover letter/us block/submitter/.cd%
+		, title/.get=\title%
+		, organisation/.get=\organisation%
+%		, position/.get=\position%
+		, street/.get=\street%
+		, house/.get=\house%
+		, zipcode/.get=\zipcode%	
+		, city/.get=\city%
+		, country/.get=\country%
+		, phone/.get=\phone%
+		, email/.get=\email%
+	}%
+	\basicStyle%
+	\ifnum\pdf@strcmp{\@empty}{\organisation}=\z@\else{\organisationStyle\organisation}\\\fi%
+	% address
+	{\addressStyle%
+		\ifnum\pdf@strcmp{\@empty}{\street}=\z@\else%
+			\ifnum\pdf@strcmp{\@empty}{\house}=\z@\else\house~\fi%
+			\street\\\fi%
+		\ifnum\pdf@strcmp{\@empty}{\city}=\z@\else%
+			\ifnum\pdf@strcmp{\@empty}{\zipcode}=\z@\else\zipcode,~\fi%
+			\city\\\fi%
+		\ifnum\pdf@strcmp{\@empty}{\country}=\z@\else\country\\\fi%
+	}%
+	\ifnum\pdf@strcmp{\@empty}{\phone}=\z@\else{\phoneStyle\phone}\\\fi%
+	\ifnum\pdf@strcmp{\@empty}{\email}=\z@\else{\emailStyle\email}\fi%
+	\egroup%
+}
+
+%%
+% Default DIN 5008 A letter date component.
+%%
+\newcommand{\classycv@PutCoverLetterUsBlock@dateComponent}{%
+	\bgroup%
+	\pgfkeys{%
+		/classycv/data/cover letter/us block/options/.cd%
+		, date line style/.get=\dateStyle%
+	}%
+	\pgfkeys{%
+		/classycv/data/cover letter/us block/submitter/.cd%
+		, date/.get=\date%
+	}%
+	% Insert a blank line.
+	\vspace*{\baselineskip}\par
+	\dateStyle%
+	% Draw the date line and a blank line.
+	\ifnum\pdf@strcmp{\@empty}{\date}=\z@\else%
+		{\date}\fi%
+	\egroup%
+}
+
+%%
+% Default recipient information component for a US business letter in block format.
+%%
+\newcommand{\classycv@PutCoverLetterUsBlockA@recipientInformationComponent}{%
+	\bgroup%
+	\pgfkeys{%
+		/classycv/data/cover letter/us block/options/.cd%
+		, recipient information basic style/.get=\basicStyle%
+		, recipient information organisation style/.get=\organisationStyle%
+		, recipient information name style/.get=\nameStyle%
+		, recipient information address style/.get=\addressStyle%
+	}%
+	\pgfkeys{%
+		/classycv/data/cover letter/us block/recipient/.cd%
+		, title/.get=\title%
+		, name/.get=\name%
+		, organisation/.get=\organisation%
+		, street/.get=\street%
+		, house/.get=\house%
+		, zipcode/.get=\zipcode%	
+		, city/.get=\city%
+		, country/.get=\country%
+	}%
+	% Insert a blank line.
+	\vspace*{\baselineskip}\par
+	\basicStyle%
+	{\nameStyle%
+		\ifnum\pdf@strcmp{\@empty}{\name}=\z@\else%
+			\ifnum\pdf@strcmp{\@empty}{\title}=\z@\else\title~\fi%
+			\name\\\fi%
+	}%
+	\ifnum\pdf@strcmp{\@empty}{\organisation}=\z@\else\organisation\\\fi%
+	{\addressStyle%
+		\ifnum\pdf@strcmp{\@empty}{\street}=\z@\else%
+			\ifnum\pdf@strcmp{\@empty}{\house}=\z@\else\house~\fi%
+			\street\\\fi%
+		\ifnum\pdf@strcmp{\@empty}{\city}=\z@\else%
+			\ifnum\pdf@strcmp{\@empty}{\zipcode}=\z@\else\zipcode,~\fi%
+			\city\\\fi%
+		\ifnum\pdf@strcmp{\@empty}{\country}=\z@\else\country\\\fi%
+	}%
+	\egroup%
+}
+
+%%
+% Default opening component for US cover letter in block format.
+%%
+\newcommand{\classycv@PutCoverLetterUsBlock@openingComponent}{%
+	\bgroup%
+	\pgfkeys{/classycv/data/cover letter/us block/opening/.get=\opening}%
+	\pgfkeys{/classycv/data/cover letter/us block/options/opening line style/.get=\openingStyle}%
+	% Skip the subject line if no subject was specified.
+	\ifnum\pdf@strcmp{\@empty}{\opening}=\z@%
+	\else%
+		% Insert a blank line.
+		\vspace*{\baselineskip}\par
+		% Append the opening line and add a line skip as per DIN 5008 A requirement.
+		{\openingStyle\opening}%
+	\fi%
+	\egroup%
+}
+
+%%
+% Default subject component for US cover letter in block format.
+%%
+\newcommand{\classycv@PutCoverLetterUsBlock@subjectComponent}{%
+	\bgroup%
+	\pgfkeys{/classycv/data/cover letter/us block/subject/.get=\subject}%
+	\pgfkeys{/classycv/data/cover letter/us block/options/subject line style/.get=\subjectStyle}%
+	% Skip the subject line if no subject was specified.
+	\ifnum\pdf@strcmp{\@empty}{\subject}=\z@%
+	\else%
+		% Insert a blank line.
+		\vspace*{\baselineskip}\par
+		\begin{center}%
+		{\subjectStyle\subject}%
+		\end{center}%
+	\fi%
+	\egroup%
+}
+
+%%
+% Default closing component for US cover letter in block format.
+%%
+\newcommand{\classycv@PutCoverLetterUsBlock@closingComponent}{%
+	\bgroup%
+	\pgfkeys{/classycv/data/cover letter/us block/closing/.get=\closing}%
+	\pgfkeys{
+		/classycv/data/cover letter/us block/submitter/.cd%
+		, name/.get=\name%
+		, organisation/.get=\organisation%
+		, position/.get=\position%
+	}%
+	\pgfkeys{/classycv/data/cover letter/us block/options/.cd%
+		, closing line style/.get=\closingStyle%
+		, signature basic style/.get=\basicStyle%
+		, signature name line style/.get=\nameStyle%
+		, signature position line style/.get=\nameStyle%
+	}%
+	\basicStyle%
+	% Insert a blank line and draw closing line.
+	\vspace*{\baselineskip}\par%
+	\ifnum\pdf@strcmp{\@empty}{\closing}=\z@
+		\else{\closingStyle\closing}\fi
+	% Insert two blank lines and draw submitter name and position.
+	\vspace*{2\baselineskip}\par%
+	\ifnum\pdf@strcmp{\@empty}{\name}=\z@%
+		\else{\nameStyle\name}\\\fi%
+	\ifnum\pdf@strcmp{\@empty}{\position}=\z@%
+		\else{\nameStyle\position}\\\fi%
+	\egroup%
+}
+
+%%
+% Classic cover letter format.
 %
 % #1, #2: see environment "Resume".
 %%
-\newenvironment{classycv@PutResumeThirtySeventy}[2][]{%
+\newenvironment{classycv@PutResumeClassic}[2][]{%
+	\bgroup%
+	\pgfkeys{/classycv/data/settings/resume/classic/options/.cd, #1}%
+	\pgfkeys{/classycv/data/settings/resume/classic/.cd, #2}%
+	\@ifundefined{/classycv/components/resume/header}{\classycvDefineComponent{/resume/header}{\classycv@PutResumeClassic@headerComponent}}{}%
+	\@ifundefined{/classycv/components/resume/footer}{\classycvDefineComponent{/resume/footer}{\classycv@PutResumeClassic@footerComponent}}{}%
+	% Set page geometry and style; clear page.
+	\loadgeometry{resume-classic}%
+	\pagestyle{resume-classic}%
+	\clearpage%
+	% Set indentation to zero.
+	\setlength{\parindent}{0pt}%
+}{%
+	\vfill%
+	% Restore indentation.
+	\setlength{\parindent}{\classycv@parindent@default}%
+	\clearpage%
+	\egroup%
+}
+
+%%
+% Default classic resume header.
+%%
+\newcommand{\classycv@PutResumeClassic@headerComponent}{%
+	\bgroup%
+	\pgfkeys{/classycv/data/settings/resume/classic/.cd%
+		, name/.get=\name%
+		, title/.get=\title%
+	}%
+	\pgfkeys{/classycv/data/settings/resume/classic/options/.cd%
+		, header basic style/.get=\basicStyle%
+		, header foreground color/.get=\fg%
+		, has header delimiter/.get=\hasDelimiter%
+		, header delimiter color/.get=\delimiterColor%
+	}%
+	\tikz {%
+		\draw[draw=none, use as bounding box] rectangle (0, \classycv@GEOMETRY@RESUMECLASSIC@HEADERHEIGHT);
+		\node[draw=none, inner sep=0pt, outer sep=0pt, below right=0pt and 0pt of current bounding box.north west, text width=\textwidth, text height=\dimexpr0.66\classycv@GEOMETRY@RESUMECLASSIC@HEADERHEIGHT\relax, text depth=\dimexpr0.34\classycv@GEOMETRY@RESUMECLASSIC@HEADERHEIGHT\relax] {%
+			\expandafter\color\expandafter{\fg}\basicStyle%
+				{\name\hfill\title}%
+		};%
+		\ifnum\pdf@strcmp{\@empty}{\hasDelimiter}=\z@\else\draw[draw=\delimiterColor] (0, 0) -- (\textwidth, 0);\fi%
+	}%
+	\egroup%
+}
+
+%%
+% Default classic resume footer.
+%%
+\newcommand{\classycv@PutResumeClassic@footerComponent}{%
+	\bgroup%
+	\pgfkeys{/classycv/data/settings/resume/classic/.cd%
+		, phone/.get=\phone%
+		, email/.get=\email%
+	}%
+	\pgfkeys{/classycv/data/settings/resume/classic/options/.cd%
+		, footer basic style/.get=\basicStyle%
+		, footer foreground color/.get=\fg%
+		, has footer delimiter/.get=\hasDelimiter%
+		, footer delimiter color/.get=\delimiterColor%
+	}%
+	\tikz {%
+		\draw[draw=none, use as bounding box] rectangle (0, \classycv@GEOMETRY@RESUMECLASSIC@FOOTERHEIGHT);
+		\ifnum\pdf@strcmp{\@empty}{\hasDelimiter}=\z@\else\draw[draw=\delimiterColor] (0, \classycv@GEOMETRY@RESUMECLASSIC@FOOTERHEIGHT) -- (\textwidth, \classycv@GEOMETRY@RESUMECLASSIC@FOOTERHEIGHT);\fi%
+		\node[draw=none, inner sep=0pt, outer sep=0pt, below right=0pt and 0pt of current bounding box.north west, text width=\textwidth, text height=\dimexpr0.66\classycv@GEOMETRY@RESUMECLASSIC@FOOTERHEIGHT\relax, text depth=\dimexpr0.34\classycv@GEOMETRY@RESUMECLASSIC@FOOTERHEIGHT\relax] {%
+			\expandafter\color\expandafter{\fg}\basicStyle%
+				{\phone\hfill\email}%
+		};%
+	}%
+	\egroup%
+}
+
+%%
+% Modern resume format.
+%
+% #1, #2: see environment "Resume".
+%%
+\newenvironment{classycv@PutResumeModern}[2][]{%
 	\bgroup%
 	% Gather options and parameters.
-	\pgfkeys{/classycv/data/resume/Thirty Seventy/options/.cd, #1}%
-	\pgfkeys{/classycv/data/resume/Thirty Seventy/.cd, #2}%
+	\pgfkeys{/classycv/data/resume/modern/options/.cd, #1}%
+	\pgfkeys{/classycv/data/resume/modern/.cd, #2}%
 	\pgfkeys{%
-		/classycv/data/resume/Thirty Seventy/options/.cd%
+		/classycv/data/resume/modern/options/.cd%
 		, right basic style/.get=\rightStyle%
 		, right foreground color/.get=\rightFg%
+		, left background color/.get=\leftBg%
 		, delimiter color/.get=\delimiterColor%
+		, delimiter width/.get=\delimiterWidth%
 	}%
 	% Define default components
-	\@ifundefined{/classycv/components/resume/left}{\classycvDefineComponent{/resume/left}{\classycv@PutResumeThirtySeventy@leftComponent}}{}%
-	\@ifundefined{/classycv/components/resume/left/picture}{\classycvDefineComponent{/resume/left/picture}{\classycv@PutResumeThirtySeventy@left@pictureComponent}}{}%
-	\@ifundefined{/classycv/components/resume/left/personal data}{\classycvDefineComponent{/resume/left/personal data}{\classycv@PutResumeThirtySeventy@left@personalDataComponent}}{}%
-	\@ifundefined{/classycv/components/resume/left/contact data}{\classycvDefineComponent{/resume/left/contact data}{\classycv@PutResumeThirtySeventy@left@contactDataComponent}}{}%
-	\@ifundefined{/classycv/components/resume/left/extra data}{\classycvDefineComponent{/resume/left/extra data}{\classycv@PutResumeThirtySeventy@left@extraDataComponent}}{}%
+	\@ifundefined{/classycv/components/resume/header}{\classycvDefineComponent{/resume/header}{}}{\ClassWarning{classycv}{(!) This resume format does not support a header component}}%
+	\@ifundefined{/classycv/components/resume/footer}{\classycvDefineComponent{/resume/footer}{}}{\ClassWarning{classycv}{(!) This resume format does not support a footer component}}%
+	\@ifundefined{/classycv/components/resume/left}{\classycvDefineComponent{/resume/left}{\classycv@PutResumeModern@leftComponent}}{}%
+	\@ifundefined{/classycv/components/resume/left/picture}{\classycvDefineComponent{/resume/left/picture}{\classycv@PutResumeModern@left@pictureComponent}}{}%
+	\@ifundefined{/classycv/components/resume/left/title}{\classycvDefineComponent{/resume/left/title}{\classycv@PutResumeModern@left@titleComponent}}{}%
+	\@ifundefined{/classycv/components/resume/left/personal data}{\classycvDefineComponent{/resume/left/personal data}{\classycv@PutResumeModern@left@personalDataComponent}}{}%
+	\@ifundefined{/classycv/components/resume/left/contact data}{\classycvDefineComponent{/resume/left/contact data}{\classycv@PutResumeModern@left@contactDataComponent}}{}%
+	\@ifundefined{/classycv/components/resume/left/extra data}{\classycvDefineComponent{/resume/left/extra data}{\classycv@PutResumeModern@left@extraDataComponent}}{}%
 	% Set left component width.
 	\setlength{\classycv@@lI}{\dimexpr0.7\textwidth}%
 	\setlength{\classycv@@lII}{\dimexpr0.3\textwidth}%
-	\setlength{\classycv@@lIII}{\dimexpr\paperheight-\dimexpr\classycv@GEOMETRY@BLANK@TMARGIN+\classycv@GEOMETRY@BLANK@TMARGIN}%
+	\setlength{\classycv@@lIII}{\dimexpr\paperheight-2\classycv@GEOMETRY@BLANK@MARGIN}%
 	% Set page geometry and style; clear page.
 	\loadgeometry{blank}%
 	\pagestyle{blank}%
@@ -1284,9 +1623,9 @@
 	\begin{tcolorbox}[%
 		blanker%
 		% Shift the right box part to the right by the width of the left side plus left page margin.
-		, leftupper=\dimexpr\classycv@@lII+\dimexpr2\classycv@GEOMETRY@BLANK@LMARGIN\relax%
+		, leftupper=\dimexpr\classycv@@lII+\dimexpr\classycv@GEOMETRY@BLANK@MARGIN\relax%
 		% Add slight padding.
-		, boxsep=2em%
+%		, boxsep=2em%
         , width=\textwidth%
         , height fixed for=all%
         , height fill=true%
@@ -1294,24 +1633,28 @@
         , break at=\textheight%
         % Draw left page side as overlay.
 		, overlay unbroken and first={%	
-			\draw[draw=none, use as bounding box] rectangle (\classycv@@lII, \classycv@@lIII);%
+			\draw[fill=\leftBg, draw=none, use as bounding box] rectangle (\classycv@@lII, \classycv@@lIII);%
 			\node[draw=none, text width=\classycv@@lII, below right=0pt and 0pt of current bounding box.north west, outer sep=0pt, inner sep=0pt]{%
 				\classycv@PutComponent{/resume/left}%
 			};%
 			% Draw delimiting vertical line.
-			\draw[draw=\delimiterColor, very thick, opacity=0.25] (\dimexpr\classycv@@lII+\classycv@GEOMETRY@BLANK@LMARGIN, \classycv@GEOMETRY@BLANK@LMARGIN) -- (\dimexpr\classycv@@lII+\classycv@GEOMETRY@BLANK@LMARGIN, \dimexpr\classycv@@lIII-\classycv@GEOMETRY@BLANK@LMARGIN);%
+			\draw[draw=\delimiterColor, line width=\delimiterWidth, opacity=0.25] (\dimexpr\classycv@@lII+\classycv@GEOMETRY@BLANK@MARGIN, \classycv@GEOMETRY@BLANK@MARGIN) -- (\dimexpr\classycv@@lII+\classycv@GEOMETRY@BLANK@MARGIN, \classycv@@lIII);%
 		}%
 		, overlay middle and last={%
-			\draw[draw=none, use as bounding box] rectangle (\classycv@@lII, \classycv@@lIII);%
+			\draw[fill=\leftBg, draw=none, use as bounding box] rectangle (\classycv@@lII, \classycv@@lIII);%
 			\node[draw=none, text width=\classycv@@lII, below right=0pt and 0pt of current bounding box.north west, outer sep=0pt, inner sep=0pt]{%
 				\classycv@PutComponent{/resume/left}%
 			};%
 			% Draw delimiting vertical line.
-			\draw[draw=\delimiterColor, very thick, opacity=0.25] (\dimexpr\classycv@@lII+\classycv@GEOMETRY@BLANK@LMARGIN, \classycv@GEOMETRY@BLANK@LMARGIN) -- (\dimexpr\classycv@@lII+\classycv@GEOMETRY@BLANK@LMARGIN, \dimexpr\classycv@@lIII-\classycv@GEOMETRY@BLANK@LMARGIN);%
+			\draw[draw=\delimiterColor, line width=\delimiterWidth, opacity=0.25] (\dimexpr\classycv@@lII+\classycv@GEOMETRY@BLANK@MARGIN, \classycv@GEOMETRY@BLANK@MARGIN) -- (\dimexpr\classycv@@lII+\classycv@GEOMETRY@BLANK@MARGIN, \classycv@@lIII);%
 		}%
 	]%
 	\bgroup\expandafter\color\expandafter{\rightFg}\rightStyle%
+	\begin{center}%
+		\begin{varwidth}{\dimexpr\classycv@@lI-1in\relax}%
 }{%
+		\end{varwidth}%
+	\end{center}%
 	\egroup%
 	\vfill%
 	\end{tcolorbox}%
@@ -1322,324 +1665,178 @@
 }
 
 %%
-% Thirty Seventy resume format default left component. 
+% Modern resume format default left component. 
 %%
-\newcommand{\classycv@PutResumeThirtySeventy@leftComponent}{%
+\newcommand{\classycv@PutResumeModern@leftComponent}{%
 	\bgroup%
 	\pgfkeys{%
-		/classycv/data/resume/Thirty Seventy/.cd%
-		, picture/.get=\picture%
+		/classycv/data/resume/modern/options/.cd%
+		, left foreground color/.get=\rightFg%
+		, left basic style/.get=\style%
+	}%
+	\style\expandafter\color\expandafter{\rightFg}%
+	% Picture.
+	\classycv@PutComponent{/resume/left/picture}%
+	% Draw title.
+	\classycv@PutComponent{/resume/left/title}%
+	% Draw personal data.
+	\classycv@PutComponent{/resume/left/personal data}%
+	% Draw contact data.
+	\classycv@PutComponent{/resume/left/contact data}%
+	% Draw extra data (optional).
+	\classycv@PutComponent{/resume/left/extra data}%
+	\egroup%
+}
+
+%%
+% Modern resume format default picture component. 
+%%
+\newcommand{\classycv@PutResumeModern@left@pictureComponent}{%
+	\bgroup%
+	\pgfkeys{/classycv/data/resume/modern/picture/.get=\picture}%
+	\ifnum\pdf@strcmp{\@empty}{\picture}=\z@%
+		\vspace*{2\baselineskip}\par%
+	\else%
+		\includegraphics[width=\linewidth]{\picture}%
+		\\[2\baselineskip]%
+	\fi%
+	\egroup%
+}
+
+%%
+% Modern resume format default left title component.
+%%
+\newcommand{\classycv@PutResumeModern@left@titleComponent}{%
+	\bgroup%
+	\pgfkeys{%
+		/classycv/data/resume/modern/.cd%
 		, name/.get=\name%
 		, title/.get=\title%
 	}%
 	\pgfkeys{%
-		/classycv/data/resume/Thirty Seventy/options/.cd%
-		, left foreground color/.get=\righFg%
-		, left basic style/.get=\style%
+		/classycv/data/resume/modern/options/.cd%
+		, left title style/.get=\titleStyle%
+		, left title name style/.get=\titleNameStyle%
 	}%
-	\style\expandafter\color\expandafter{\rightFg}%
 	\begin{center}%
-		% Picture (optional).
-		\ifnum\pdf@strcmp{\@empty}{\picture}=\z@%
-			\vspace*{4em}\par%
-		\else%
-			\classycv@PutComponent{/resume/left/picture}%
-			\vspace*{2em}\par%
-		\fi%
-		% Draw title.
-		{\larger[3]\bfseries\name}\\
-		\ifnum\pdf@strcmp{\@empty}{\title}=\z@\else\larger[2]\fontseries{l}\selectfont\title\\\fi%
-		% Draw personal data.
-		\classycv@PutComponent{/resume/left/personal data}%
-		% Draw contact data.
-		\classycv@PutComponent{/resume/left/contact data}%
-		% Draw extra data (optional).
-		\classycv@PutComponent{/resume/left/extra data}%
+		\ifnum\pdf@strcmp{\@empty}{\name}=\z@\else%
+			{\titleStyle{\name}}\\\fi%
+		\ifnum\pdf@strcmp{\@empty}{\title}=\z@\else%
+			{\titleNameStyle{\title}}\\\fi%
 	\end{center}%
 	\egroup%
 }
 
 %%
-% Thirty Seventy resume format default picture component. 
+% Modern resume format default personal data component for left side.
 %%
-\newcommand{\classycv@PutResumeThirtySeventy@left@pictureComponent}{%
+\newcommand{\classycv@PutResumeModern@left@personalDataComponent}{%
 	\bgroup%
-	\pgfkeys{/classycv/data/resume/Thirty Seventy/picture/.get=\picture}%
-	\includegraphics[width=\linewidth]{\picture}%
-	\egroup%
-}
-%%
-% Thirty Seventy resume format default personal data component for left side.
-%%
-\newcommand{\classycv@PutResumeThirtySeventy@left@personalDataComponent}{%
-	\bgroup%
-	\pgfkeys{/classycv/data/resume/Thirty Seventy/personal data heading text/.get=\text}%
+	\pgfkeys{/classycv/data/resume/modern/personal data heading text/.get=\text}%
 	% Put picture.
 	\pgfkeys{%
-		/classycv/data/resume/Thirty Seventy/.cd%
+		/classycv/data/resume/modern/.cd%
 		, birthdate/.get=\birthdate%
 		, marital status/.get=\status%
 		, nationality/.get=\nationality%
 	}%
-	\pgfkeys{%
-		/classycv/data/resume/Thirty Seventy/options/.cd%
-		, left foreground color/.get=\fg%
-		, left header style/.get=\leftHeaderStyle%
-		, left entry style/.get=\leftEntryStyle%
-	}%
+	% NOTE Parameters handed down need to be expanded first.
+	\edef\@@headerColor{\pgfkeysvalueof{/classycv/data/resume/modern/options/left header color}}%
+	\edef\@@backgroundColor{\pgfkeysvalueof{/classycv/data/resume/modern/options/left background color}}%
 	% Put personal data.
 	\heading[%
-		width=\dimexpr\linewidth-24pt\relax%
-		, has label=yes%
-		, label position=left%
-		, label text={\faUser}%
-		, skip above=2em%
-		, skip below=0em%
-		, label color=accent-color%
-		, label frame color=accent-color%
-		, label text color=nearly-white%
-		, basic style=\leftHeaderStyle%
-	] {\text}
-	\begin{Table}[%
-		skip above=1em%
-		, skip below=0em%
-		, column format={C{2em} p{\linewidth-24pt-2em-3\tabcolsep}}%
-		, basic style=\leftEntryStyle%
-	]%
-		\ifnum\pdf@strcmp{\birthdate}{\@empty}=\z@%
-		\else%
-			{\larger[2]\cmbrfamily\textborn}&\birthdate\\%
-		\fi%
-		\ifnum\pdf@strcmp{\status}{\@empty}=\z@%
-		\else%
-			{\larger[2]\cmbrfamily\textmarried}&\status\\%
-		\fi%
-		\ifnum\pdf@strcmp{\nationality}{\@empty}=\z@%
-		\else%
-			{\larger[2]\cmbrfamily\Mundus}&\nationality%
-		\fi%
-	\end{Table}%
+		, width=\dimexpr\linewidth-12pt\relax%
+		, skip above=2\baselineskip%
+		, skip below=0pt%
+		, skip left=12pt%
+		, basic style=\pgfkeysvalueof{/classycv/data/resume/modern/options/left header style}%
+		, foreground color=\@@headerColor%
+		, background color=\@@backgroundColor%
+		, border width=0pt%
+		, border color=accent-color%
+		, padding=0pt%
+	] {\circle[border width=2pt]\faUser~~\text}%
+	\hspace*{6pt}%
+	\begin{varwidth}{\linewidth-12pt}%
+		\begin{Table}[%
+			, skip below=\baselineskip%
+			, column format={C{0.175\linewidth} p{0.825\linewidth-3\tabcolsep}}%
+			, basic style=\pgfkeysvalueof{/classycv/data/resume/modern/options/left entry style}%
+		]%
+			\ifnum\pdf@strcmp{\birthdate}{\@empty}=\z@%
+			\else%
+				{\larger[2]\cmbrfamily\textborn}&\birthdate\\%
+			\fi%
+			\ifnum\pdf@strcmp{\status}{\@empty}=\z@%
+			\else%
+				{\larger[2]\cmbrfamily\textmarried}&\status\\%
+			\fi%
+			\ifnum\pdf@strcmp{\nationality}{\@empty}=\z@%
+			\else%
+				{\larger[2]\cmbrfamily\Mundus}&\nationality%
+			\fi%
+		\end{Table}%
+	\end{varwidth}%
+	\\%
 	\egroup%
 }
 
 %%
-% Thirty Seventy resume format default contact data component for left side.
+% Modern resume format default contact data component for left side.
 %%
-\newcommand{\classycv@PutResumeThirtySeventy@left@contactDataComponent}{%
-	\pgfkeys{/classycv/data/resume/Thirty Seventy/contact data heading text/.get=\text}%
+\newcommand{\classycv@PutResumeModern@left@contactDataComponent}{%
+	\bgroup%
+	\pgfkeys{/classycv/data/resume/modern/contact data heading text/.get=\text}%
 	\pgfkeys{%
-		/classycv/data/resume/Thirty Seventy/.cd%
+		/classycv/data/resume/modern/.cd%
 		, phone/.get=\phone%
 		, mobile/.get=\mobile%
 		, email/.get=\email%
 		, website/.get=\website%
 	}%
 	\pgfkeys{%
-		/classycv/data/resume/Thirty Seventy/options/.cd%
+		/classycv/data/resume/modern/options/.cd%
 		, left foreground color/.get=\fg%
-		, left header style/.get=\leftHeaderStyle%
-		, left entry style/.get=\leftEntryStyle%		
+		, left entry style/.get=\entryStyle%
 	}%
+	% NOTE Parameters handed down need to be expanded first.
+	\edef\@@headerColor{\pgfkeysvalueof{/classycv/data/resume/modern/options/left header color}}%
+	\edef\@@backgroundColor{\pgfkeysvalueof{/classycv/data/resume/modern/options/left background color}}%
+	% Put contact data.
 	\heading[%
-		width=\dimexpr\linewidth-24pt\relax%
-		, has label=yes%
-		, label position=left%
-		, label text={\faComments}%
-		, skip above=2em%
-		, skip below=0em%
-		, label color=accent-color%
-		, label frame color=accent-color%
-		, label text color=nearly-white%
-		, basic style=\leftHeaderStyle%
-	] {\text}
-	\begin{Table}[%
-		skip above=1em%
-		, skip below=0em%
-		, column format={C{2em} p{\linewidth-24pt-2em-3\tabcolsep}}%
-		, basic style=\leftEntryStyle%
-	]%	
-		\ifnum\pdf@strcmp{\phone}{\@empty}=\z@\else{\larger[2]\cmbrfamily\Telefon}&\phone\\\fi%
-		\ifnum\pdf@strcmp{\mobile}{\@empty}=\z@\else{\larger[2]\cmbrfamily\faMobile}&\mobile\\\fi%
-		\ifnum\pdf@strcmp{\email}{\@empty}=\z@\else{\larger[2]\cmbrfamily\Letter}&\email\\\fi%
-		\ifnum\pdf@strcmp{\website}{\@empty}=\z@\else{\larger[2]\cmbrfamily\ComputerMouse}&\website\fi%
-	\end{Table}%
+		width=\dimexpr\linewidth-12pt\relax%
+		, skip above=2\baselineskip%
+		, skip below=0pt%
+		, skip left=12pt%
+		, basic style=\pgfkeysvalueof{/classycv/data/resume/modern/options/left header style}%
+		, foreground color=\@@headerColor%
+		, background color=\@@backgroundColor%
+		, border width=0pt%
+		, border color=accent-color%
+		, padding=0pt%
+	] {\circle[border width=2pt]\faComments~~\text}%
+	\hspace*{6pt}%
+	\begin{varwidth}{\linewidth-12pt}%
+		\begin{Table}[%
+%			skip above=\baselineskip%
+			, skip below=\baselineskip%
+			, column format={C{0.175\linewidth} p{0.825\linewidth-3\tabcolsep}}%
+			, basic style=\entryStyle%
+		]%	
+			\ifnum\pdf@strcmp{\phone}{\@empty}=\z@\else{\larger[2]\cmbrfamily\Telefon}&\phone\\\fi%
+			\ifnum\pdf@strcmp{\mobile}{\@empty}=\z@\else{\larger[2]\cmbrfamily\faMobile}&\mobile\\\fi%
+			\ifnum\pdf@strcmp{\email}{\@empty}=\z@\else{\larger[2]\cmbrfamily\Letter}&\email\\\fi%
+			\ifnum\pdf@strcmp{\website}{\@empty}=\z@\else{\larger[2]\cmbrfamily\ComputerMouse}&\website\fi%
+		\end{Table}%
+	\end{varwidth}%
+	\\%
+	\egroup%
 }
 
 %%
-% Thirty Seventy resume format default extra dat component for left side.
+% Modern resume format default extra dat component for left side.
 %%
-\newcommand{\classycv@PutResumeThirtySeventy@left@extraDataComponent}{}%
-
-% TODO remove?
-\iffalse
-%
-%! Twenty Eighty resume format.
-%
-\newenvironment{classycv@PutResumeTwentyEighty}[2][]{%
-	\bgroup%
-	%! Set data
-	\pgfkeys{/classycv/data/resume/Twenty Eighty/options/.cd, #1}
-	\pgfkeys{/classycv/data/resume/Twenty Eighty/.cd, #2}%
-	%! Define default components
-	\@ifundefined{/classycv/components/resume/picture}{\classycvDefineComponent{/resume/picture}{\classycv@PutResumeTwentyEighty@pictureComponent}}{}
-	\@ifundefined{/classycv/components/resume/information}{\classycvDefineComponent{/resume/information}{\classycv@PutResumeTwentyEighty@informationComponent}}{}
-	\@ifundefined{/classycv/components/resume/contact}{\classycvDefineComponent{/resume/contact}{\classycv@PutResumeTwentyEighty@contactComponent}}{}
-	\@ifundefined{/classycv/components/resume/extra}{\classycvDefineComponent{/resume/extra}{\classycv@PutResumeTwentyEighty@extraComponent}}{}%
-	\@ifundefined{/classycv/components/resume/title}{\classycvDefineComponent{/resume/title}{\classycv@PutResumeTwentyEighty@titleComponent}}{}%
-	%! Set geometry and page style; clear page.
-	\loadgeometry{blank}%
-	\pagestyle{blank}%
-	\clearpage%
-	%! Set indentation to zero.
-	\setlength{\parindent}{0pt}%
-    \begin{tcolorbox}[%
-        blanker%
-        , leftupper=0.2\paperwidth%
-        , boxsep=24pt%
-        , width=\paperwidth%
-        , height fill=true%
-        , height fixed for=all%
-        , breakable%
-        , break at=\textheight%
-        %! Put left page side as overlay.
-        , overlay unbroken and first={%
-			\pgfkeys{%
-				/classycv/data/resume/Twenty Eighty/options/.cd%
-				, left background color/.get=\bg%
-				, left foreground color/.get=\fg%
-			}%
-            \draw[use as bounding box, inner sep=0pt, outer sep=0pt, draw=none, fill=\bg] (0, 0) rectangle (0.2\paperwidth, \paperheight);%
-            \node[draw=none, inner sep=0pt, outer sep=0pt, text width=0.2\paperwidth, below right=0pt and 0pt of current bounding box.north west]{%
-                \classycv@PutComponent{/resume/picture}%
-                \classycv@PutComponent{/resume/information}%
-                \classycv@PutComponent{/resume/contact}%
-            };%
-        }%
-        , overlay middle and last={%
-			\pgfkeys{%
-				/classycv/data/resume/Twenty Eighty/options/.cd%
-				, left background color/.get=\bg%
-				, left foreground color/.get=\fg%
-			}%
-            \draw[use as bounding box, inner sep=0pt, outer sep=0pt, draw=none, fill=\bg] (0, 0) rectangle (0.2\paperwidth, \paperheight);%
-            \node[rotate=90, inner sep=0pt, outer sep=0pt, minimum width=\paperheight, minimum height=0.3\paperwidth, text width=\paperheight, anchor=north west, align=center] {%
-                \pgfkeys{/classycv/data/resume/Thirty Seventy/name/.get=\name}%
-                \bgroup%
-                    \color{nearly-white}\bfseries\fontsize{84pt}{92pt}\selectfont\name%
-                \egroup%
-            };%
-        }%
-    ]%
-    %
-    %! Put right page side.
-    %
-    %! Apply content style.
-    \csname/classycv/style/resume/content\endcsname\relax%
-    %! Put title
-    \classycv@PutComponent{/resume/title}%
-}{%
-	\end{tcolorbox}%
-	%! Restore indentation.
-	\setlength{\parindent}{\classycv@parindent@default}%
-	\egroup%
-}
-
-%
-%! Twenty Eighty resume format default components. 
-%
-
-\newcommand{\classycv@PutResumeTwentyEighty@pictureComponent}{%
-	\bgroup%
-	%! put picture
-	\pgfkeys{/classycv/data/resume/Twenty Eighty/picture/.get=\picture}%
-	\ifnum\pdf@strcmp{\picture}{\@empty}=\z@%
-	\else%
-%		\vspace*{24pt}\par%
-		\centerline{%
-			\tcbox[boxsep=0pt, width=\linewidth, left=0pt, bottom=0pt, right=0pt, top=0pt, leftrule=0pt, bottomrule=0pt, rightrule=0pt, toprule=0pt, colframe=light-gray, sharp corners, standard jigsaw, opacityback=0]{%
-				\tikz[opacity=0.95]{%
-					\node{\includegraphics[width=\dimexpr0.75\linewidth\relax, keepaspectratio]{\picture}}%
-				}%
-			}%
-		}%
-		\vspace*{24pt}\par
-	\fi%
-	\egroup%
-}
-
-\newcommand{\classycv@PutResumeTwentyEighty@informationComponent}{%
-	\bgroup%
-	%! put personal data
-	\pgfkeys{
-		/classycv/data/resume/Twenty Eighty/.cd%
-		, birthdate/.get=\birthdate%
-		, marital status/.get=\status%
-		, nationality/.get=\nationality%
-	}%
-	\adjustbox{margin=12pt 12pt 12pt 0pt, minipage=\linewidth-24pt}{%
-		%! Style put before this component is being ignored and hence has to be restated here.
-		\@ifundefined{/classycv/style/resume/information}{}{\csname/classycv/style/resume/information\endcsname}%
-		%! Put the heading
-		\classycv@tResume@heading[\raggedleft][\smallskip][]{\color{light-gray}\normalsize\faUser}%
-		%! Put the delimiter
-		\classycv@Resume@PutDelimiter[\linewidth][10pt][2pt]{nearly-white}%
-		%! Put content table
-		\setlength{\tabcolsep}{0pt}%
-		\begin{tabularx}{\linewidth}{M{24pt} X}%
-			\ifnum\pdf@strcmp{\birthdate}{\@empty}=\z@\else{\cmrfamily\large\textborn}&\birthdate\\[0.5em]\fi%
-			\ifnum\pdf@strcmp{\status}{\@empty}=\z@\else{\cmrfamily\large\textmarried}&\status\\[0.5em]\fi%
-			\ifnum\pdf@strcmp{\nationality}{\@empty}=\z@\else{\large\Mundus}&\nationality\\\fi%
-		\end{tabularx}%
-		\setlength{\tabcolsep}{\classycv@tabcolsep@default}%
-	}%
-	\par%
-	\egroup%
-}
-
-\newcommand{\classycv@PutResumeTwentyEighty@contactComponent}{%
-	\bgroup%
-	\pgfkeys{
-		/classycv/data/resume/Twenty Eighty/.cd%
-		, phone/.get=\phone%
-		, mobile/.get=\mobile%
-		, email/.get=\email%
-		, website/.get=\website%
-	}%
-	%! put contact data
-	\adjustbox{margin=12pt 12pt 12pt 0pt, minipage=\linewidth-24pt}{%
-		%! Style put before this component is being ignored and hence has to be restated here.
-		\@ifundefined{/classycv/style/resume/information}{}{\csname/classycv/style/resume/information\endcsname}%
-		%! Put heading
-		\classycv@Resume@PutHeading[\raggedleft][][]{\color{light-gray}\normalsize\faCommentsO}%
-		%! Put delimiter
-		\classycv@Resume@PutDelimiter[\linewidth][10pt][2pt]{nearly-white}%
-		%! Put content table
-		\setlength{\tabcolsep}{0pt}
-		\begin{tabularx}{\linewidth}{M{24pt} X}
-			\ifnum\pdf@strcmp{\phone}{\@empty}=\z@\else{\large\Telefon}&\phone\\[0.5em]\fi%
-			\ifnum\pdf@strcmp{\mobile}{\@empty}=\z@\else{\large\faMobile}&\mobile\\[0.5em]\fi%
-			\ifnum\pdf@strcmp{\email}{\@empty}=\z@\else{\large\Letter}&\email\\[0.5em]\fi%
-			\ifnum\pdf@strcmp{\website}{\@empty}=\z@\else{\large\ComputerMouse}&\website\fi%
-		\end{tabularx}%
-		\setlength{\tabcolsep}{\classycv@tabcolsep@default}
-	}%
-	\par%
-	\egroup%
-}
-
-\newcommand{\classycv@PutResumeTwentyEighty@extraComponent}{%
-\relax%
-}
-
-\newcommand{\classycv@PutResumeTwentyEighty@titleComponent}{%
-	%! Get data
-	\pgfkeys{/classycv/data/resume/Thirty Seventy/name/.get=\name}%
-	%! Put component
-	\Huge\color{nearly-white}\MakeUppercase{\name}\par%
-	%! Put delimiter
-	\classycv@Resume@PutDelimiter{nearly-white}%
-}
-\fi
+\newcommand{\classycv@PutResumeModern@left@extraDataComponent}{}%
 
 %%
 % Default attachment header.
@@ -1666,12 +1863,12 @@
 		, foreground color/.get=\fg%
 		, text style/.get=\textStyle%
 	}%
-	\setlength{\classycv@@lI}{\dimexpr\paperwidth-\dimexpr\classycv@GEOMETRY@BLANK@LMARGIN+\classycv@GEOMETRY@BLANK@RMARGIN}%
+	\setlength{\classycv@@lI}{\dimexpr\paperwidth-\dimexpr\classycv@GEOMETRY@BLANK@MARGIN+\classycv@GEOMETRY@BLANK@MARGIN}%
 	\setlength{\classycv@@lII}{\dimexpr20mm}%
 	\tikz{%
 		\draw[use as bounding box, draw=none] rectangle (\paperwidth, 20mm);%
-		\draw[draw=highlight-color, thick, opacity=0.5] (\classycv@GEOMETRY@BLANK@LMARGIN, \classycv@@lII) -- (\classycv@@lI, \classycv@@lII);%
-		\node[minimum width=\classycv@@lI, text width=\classycv@@lI, inner sep=0pt, outer sep=0pt, below right=\classycv@GEOMETRY@BLANK@BMARGIN and \classycv@GEOMETRY@BLANK@LMARGIN of current bounding box.north west]{%
+		\draw[draw=highlight-color, thick, opacity=0.5] (\classycv@GEOMETRY@BLANK@MARGIN, \classycv@@lII) -- (\classycv@@lI, \classycv@@lII);%
+		\node[minimum width=\classycv@@lI, text width=\classycv@@lI, inner sep=0pt, outer sep=0pt, below right=\classycv@GEOMETRY@BLANK@MARGIN and \classycv@GEOMETRY@BLANK@MARGIN of current bounding box.north west]{%
 			\begin{tabular}{m{0.9\dimexpr\linewidth-24pt\relax-\tabcolsep} R{0.1\dimexpr\linewidth-24pt\relax-\tabcolsep}}%
 				\ifnum\pdf@strcmp{\@empty}{\attachmentName}=\z@\else%
 					\textStyle{\bfseries\faFilesO}~\attachmentName%
@@ -1713,6 +1910,22 @@
 }
 
 \pgfkeys{%
+	/classycv/data/draw circle/options/.cd%
+	, height/.initial=\dimexpr1.5\baselineskip\relax%
+	, height/.default=\dimexpr1.5\baselineskip\relax%
+	, border width/.initial=1pt%
+	, border width/.default=1pt%
+	, border color/.default=%
+	, border color/.initial=%
+	, padding/.initial=\dimexpr0.25\ht\strutbox\relax%
+	, padding/.default=\dimexpr0.25\ht\strutbox\relax%
+	, background color/.initial=%
+	, background color/.default=%
+	, text color/.initial=%
+	, text color/.default=%
+}
+
+\pgfkeys{%
 	/classycv/data/put bar/options/.cd%
 	, width/.initial=\dimexpr\linewidth-24pt\relax%
 	, width/.default=\dimexpr\linewidth-24pt\relax%
@@ -1730,14 +1943,14 @@
 
 \pgfkeys{%
 	/classycv/data/put progress bar/options/.cd%
-	, height/.initial=1em%
-	, height/.default=1em%
+	, height/.initial=\baselineskip%
+	, height/.default=\baselineskip%
 	, background color/.initial=accent-color!25!nearly-white%
 	, background color/.default=accent-color!25!nearly-white%
 	, foreground color/.initial=accent-color%
 	, foreground color/.default=accent-color%	
-	, bar width/.initial=\linewidth%
-	, bar width/.default=\linewidth%
+	, width/.initial=\linewidth%
+	, width/.default=\linewidth%
 	, border width/.initial=0pt
 	, border width/.default=0pt	
 	, border color/.initial=none%
@@ -1814,42 +2027,34 @@
 
 \pgfkeys{%
 	/classycv/data/put heading/options/.cd%
-	, width/.initial=\dimexpr\linewidth-24pt\relax%
-	, width/.default=\dimexpr\linewidth-24pt\relax%
+	, width/.initial=\linewidth%
+	, width/.default=\linewidth%
 	, height/.initial=2em%
 	, height/.default=2em%
-	, has label/.initial=no%
-	, has label/.default=no%
-	, label shape/.initial=circle%
-	, label shape/.default=circle%
-	, label width/.initial=1.25em%
-	, label width/.default=1.25em%
-	, label color/.initial=highlight-color%
-	, label color/.default=highlight-color%
-	, label frame color/.initial=highlight-color%
-	, label frame color/.default=highlight-color%
-	, label frame width/.initial=0pt%
-	, label frame width/.default=0pt%
-	, label inner sep/.initial=4pt%
-	, label inner sep/.default=4pt%
-	, label text color/.initial=nearly-white%
-	, label text color/.default=nearly-white%
-	, label position/.initial=left%
-	, label position/.default=left%
-	, label options/.initial=\@empty%
-	, label options/.default=\@empty%
-	, label text/.initial=\@empty%
-	, label text/.default=\@empty%
+	, border color/.initial=white%
+	, border color/.default=white%
+	, border width/.initial=0pt%
+	, border width/.default=0pt%
+	, sharp corners/.initial=all%
+	, sharp corners/.default=all%
 	, basic style/.initial={\flafamily\larger[2]\bfseries}%
 	, basic style/.default={\flafamily\larger[2]\bfseries}%
-	, text color/.initial=accent-color%
-	, text color/.default=accent-color%
-	, skip above/.initial=1em%
-	, skip above/.default=1em%	
-	, skip below/.initial=2em%
-	, skip below/.default=2em%
-	, skip between/.initial=1em%
-	, skip between/.default=1em%	
+	, background color/.initial=white%
+	, background color/.default=white%
+	, foreground color/.initial=accent-color%
+	, foreground color/.default=accent-color%
+	, text align/.initial=left%
+	, text align/.default=left%
+	, skip above/.initial=\baselineskip%
+	, skip above/.default=\baselineskip%
+	, skip right/.initial=0pt%
+	, skip right/.default=0pt%
+	, skip below/.initial=2\baselineskip%
+	, skip below/.default=2\baselineskip%
+	, skip left/.initial=0pt%
+	, skip left/.default=0pt%
+	, padding/.initial=0.5em%
+	, padding/.default=0.5em%
 }
 
 \pgfkeys{%
@@ -1870,8 +2075,8 @@
 
 \pgfkeys{%
 	/classycv/data/put list/options/.cd%
-	, basic style/.initial={\lmrfamily\normalsize\mdseries}%
-	, basic style/.default={\lmrfamily\normalsize\mdseries}%
+	, basic style/.initial={\robotofamily\fontseries{l}\selectfont}%
+	, basic style/.default={\robotofamily\fontseries{l}\selectfont}%
 	, space between/.initial=0pt%
 	, space between/.default=0pt%
 	, skip above/.initial=1em%
@@ -1884,20 +2089,18 @@
 	/classycv/data/put resume entry/options/.cd%
 	, width/.initial=\dimexpr\linewidth-24pt\relax%
 	, width/.default=\dimexpr\linewidth-24pt\relax%
-	, basic style/.initial={\lmrfamily\normalsize}%
-	, basic style/.default={\lmrfamily\normalsize}%
-	, date line style/.initial={\robotofamily\normalsize\bfseries}
-	, date line style/.default={\robotofamily\normalsize\bfseries}
-	, topic line style/.initial={\robotofamily\normalsize\fontseries{l}\selectfont}
-	, topic line style/.default={\robotofamily\normalsize\fontseries{l}\selectfont}
-%	, alignment/.initial=c%
-%	, alignment/.default=c%
-	, skip above/.initial=1em%
-	, skip above/.default=1em%
-	, skip between/.initial=1em%
-	, skip between/.default=1em%
-	, skip below/.initial=0em%
-	, skip below/.default=0em%	
+	, basic style/.initial={\robotofamily\fontseries{l}\selectfont}%
+	, basic style/.default={\robotofamily\fontseries{l}\selectfont}%
+	, date line style/.initial={\flafamily\normalsize\bfseries}
+	, date line style/.default={\flafamily\normalsize\bfseries}
+	, topic line style/.initial={\flafamily\normalsize\fontseries{l}\selectfont}
+	, topic line style/.default={\flafamily\normalsize\fontseries{l}\selectfont}
+	, skip above/.initial=0pt%
+	, skip above/.default=0pt%
+	, skip between/.initial=0.5\baselineskip%
+	, skip between/.default=0.5\baselineskip%
+	, skip below/.initial=\baselineskip%
+	, skip below/.default=\baselineskip%	
 }
 
 \pgfkeys{%
@@ -1958,6 +2161,139 @@
 	, signature position line style/.default=%
 	, signature organisation line style/.initial={\MakeUppercase}%
 	, signature organisation line style/.default={\MakeUppercase}%
+	, footer style/.initial={\robotofamily\small\fontseries{l}\selectfont\MakeUppercase}%
+	, footer style/.default={\robotofamily\small\fontseries{l}\selectfont\MakeUppercase}%
+	, footer foreground color/.initial=medium-gray%
+	, footer foreground color/.default=medium-gray%
+}
+
+\pgfkeys{%
+	/classycv/data/cover letter/DIN 5008 A/submitter/.cd%
+	, title/.initial=?title%
+	, title/.default=?title%
+	, name/.initial=?name%
+	, name/.default=?name%
+	, organisation/.initial=?organisation%
+	, organisation/.default=?organisation%
+	, position/.initial=?position%
+	, position/.default=?position%
+	, street/.initial=?street%
+	, street/.default=?street%
+	, house/.initial=?house%
+	, house/.default=?house%
+	, zipcode/.initial=?zipcode%	
+	, zipcode/.default=?zipcode%	
+	, city/.initial=?city%
+	, city/.default=?city%	
+	, country/.initial=?country%
+	, country/.default=?country%
+	, phone/.initial=?phone%
+	, phone/.default=?phone%	
+	, mobile/.initial=?mobile%
+	, mobile/.default=?mobile%
+	, fax/.initial=?fax%
+	, fax/.default=?fax%
+	, email/.initial=?email%
+	, email/.default=?email%	
+	, website/.initial=?website%
+	, website/.default=?website%
+	, sign/.initial=?sign%
+	, sign/.default=?sign%
+	, reply sign/.initial=?reply%
+	, reply sign/.default=?reply%
+	, original sign/.initial=?original%
+	, original sign/.default=?original%	
+	, date/.initial=?date%
+	, date/.default=?date%	
+	, reply message date/.initial=?reply%
+	, reply message date/.default=?reply%	
+	, original message date/.initial=?original message%
+	, original message date/.default=?original message%
+	, attachments/.initial=?attachments%
+	, attachments/.default=?attachments%	
+}
+
+\pgfkeys{%
+	/classycv/data/cover letter/DIN 5008 A/recipient/.cd%
+	, rta/.initial=?rta%
+	, rta/.default=?rta%
+	, title/.initial=?title%
+	, title/.default=?title%
+	, name/.initial=?name%
+	, name/.default=?name%
+	, organisation/.initial=?organisation%
+	, organisation/.default=?organisation%
+	, position/.initial=?position%
+	, position/.default=?position%
+	, street/.initial=?street%
+	, street/.default=?street%
+	, house/.initial=?house%
+	, house/.default=?house%
+	, zipcode/.initial=?zipcode%
+	, zipcode/.default=?zipcode%
+	, city/.initial=?city%
+	, city/.default=?city%
+	, country/.initial=?country%
+	, country/.default=?country%
+}	
+
+\pgfkeys{%
+	/classycv/data/cover letter/DIN 5008 A/.cd%
+	, date/.initial=\today%
+	, date/.default=\today%
+	, subject/.initial=?subject%
+	, subject/.default=?subject%
+	, opening/.initial=?opening%
+	, opening/.default=?opening%
+	, closing/.initial=?closing%
+	, closing/.default=?closing%
+}%
+
+% TODO remove unneeded interface key-val declarations.
+\pgfkeys{%
+	/classycv/data/cover letter/us block/options/.cd%
+	, has body separator/.initial=yes%
+	, has body separator/.default=yes%
+	, has footer separator/.initial=yes%
+	, has footer separator/.default=yes%
+	, has page counter/.initial=yes%
+	, has page counter/.default=yes%
+	, recipient information basic style/.initial={\robotofamily\fontseries{l}\selectfont\normalsize}%
+	, recipient information basic style/.default={\robotofamily\fontseries{l}\selectfont\normalsize}%
+	, recipient information organisation style/.initial=%{\robotofamily\MakeUppercase}%
+	, recipient information organisation style/.default=%{\robotofamily\MakeUppercase}%
+	, recipient information name style/.initial={\robotofamily\bfseries\normalsize}%
+	, recipient information name style/.default={\robotofamily\bfseries\normalsize}%
+	, recipient information address style/.initial=%{\robotofamily\fontseries{m}\selectfont}%
+	, recipient information address style/.default=%{\robotofamily\fontseries{m}\selectfont}%
+	, submitter information basic style/.initial={\robotofamily\fontseries{l}\selectfont\normalsize}%
+	, submitter information basic style/.default={\robotofamily\fontseries{l}\selectfont\normalsize}%
+	, submitter information address style/.initial=%{\robotofamily\fontseries{m}\selectfont}%
+	, submitter information address style/.default=%{\robotofamily\fontseries{m}\selectfont}%
+	, submitter information organisation style/.initial=%{\robotofamily\MakeUppercase}%
+	, submitter information organisation style/.default=%{\robotofamily\MakeUppercase}%
+	, submitter information phone style/.initial=%{\robotofamily\fontseries{m}\selectfont}%
+	, submitter information phone style/.default=%{\robotofamily\fontseries{m}\selectfont}%
+	, submitter information email style/.initial=%{\robotofamily\fontseries{m}\selectfont}%
+	, submitter information email style/.default=%{\robotofamily\fontseries{m}\selectfont}%
+	, date line style/.initial={\robotofamily\fontseries{l}\selectfont\normalsize}%
+	, date line style/.default={\robotofamily\fontseries{l}\selectfont\normalsize}%
+	, subject line style/.initial={\lmrfamily\bfseries\normalsize\MakeUppercase}%
+	, subject line style/.default={\lmrfamily\bfseries\normalsize\MakeUppercase}%
+	, opening line style/.initial={\lmrfamily\normalsize}%
+	, opening line style/.default={\lmrfamily\normalsize}%
+	, content style/.initial={\lmrfamily\normalsize}%
+	, content style/.default={\lmrfamily\normalsize}%
+	, closing line style/.initial={\lmrfamily\normalsize}%
+	, closing line style/.default={\lmrfamily\normalsize}%
+	, signature basic style/.initial={\lmrfamily\normalsize}%
+	, signature basic style/.default={\lmrfamily\normalsize}%	
+	, signature name line style/.initial=%
+	, signature name line style/.default=%
+	, signature position line style/.initial=%
+	, signature position line style/.default=%
+	, signature organisation line style/.initial={\MakeUppercase}%
+	, signature organisation line style/.default={\MakeUppercase}%
 %	, attachments style/.initial={\robotofamily\fontseries{l}\selectfont\normalsize\color{medium-gray}}%
 %	, attachments style/.default={\robotofamily\fontseries{l}\selectfont\normalsize\color{medium-gray}}%
 	, footer style/.initial={\robotofamily\small\mdseries}
@@ -1965,158 +2301,171 @@
 }
 
 \pgfkeys{%
-	/classycv/data/cover letter/DIN 5008 A/submitter/.cd%
-	, title/.initial=\@empty%
-	, title/.default=\@empty%
-	, name/.initial=\@empty%
-	, name/.default=\@empty%
-	, organisation/.initial=\@empty%
-	, organisation/.default=\@empty%
-	, position/.initial=\@empty%
-	, position/.default=\@empty%
-	, street/.initial=\@empty%
-	, street/.default=\@empty%
-	, house/.initial=\@empty%
-	, house/.default=\@empty%
-	, zipcode/.initial=\@empty%	
-	, zipcode/.default=\@empty%	
-	, city/.initial=\@empty%
-	, city/.default=\@empty%	
-	, country/.initial=\@empty%
-	, country/.default=\@empty%
-	, phone/.initial=\@empty%
-	, phone/.default=\@empty%	
-	, mobile/.initial=\@empty%
-	, mobile/.default=\@empty%
-	, fax/.initial=\@empty%
-	, fax/.default=\@empty%
-	, email/.initial=\@empty%
-	, email/.default=\@empty%	
-	, website/.initial=\@empty%
-	, website/.default=\@empty%
-	, sign/.initial=\@empty%
-	, sign/.default=\@empty%
-	, reply sign/.initial=\@empty%
-	, reply sign/.default=\@empty%
-	, original sign/.initial=\@empty%
-	, original sign/.default=\@empty%	
-	, date/.initial=\@empty%
-	, date/.default=\@empty%	
-	, reply message date/.initial=\@empty%
-	, reply message date/.default=\@empty%	
-	, original message date/.initial=\@empty%
-	, original message date/.default=\@empty%
-	, attachments/.initial=\@empty%
-	, attachments/.default=\@empty%	
+	/classycv/data/cover letter/us block/submitter/.cd%
+	, title/.initial=?title%
+	, title/.default=?title%
+	, name/.initial=?name%
+	, name/.default=?name%
+	, organisation/.initial=?organisation%
+	, organisation/.default=?organisation%
+	, position/.initial=?position%
+	, position/.default=?position%
+	, street/.initial=?street%
+	, street/.default=?street%
+	, house/.initial=?house%
+	, house/.default=?house%
+	, zipcode/.initial=?zipcode%	
+	, zipcode/.default=?zipcode%	
+	, city/.initial=?city%
+	, city/.default=?city%	
+	, country/.initial=?country%
+	, country/.default=?country%
+	, phone/.initial=?phone%
+	, phone/.default=?phone%	
+	, mobile/.initial=?mobile%
+	, mobile/.default=?mobile%
+	, fax/.initial=?fax%
+	, fax/.default=?fax%
+	, email/.initial=?email%
+	, email/.default=?email%	
+	, website/.initial=?website%
+	, website/.default=?website%
+	, date/.initial=?date%
+	, date/.default=?date%	
+	, attachments/.initial=?attachments%
+	, attachments/.default=?attachments%	
 }
 
 \pgfkeys{%
-	/classycv/data/cover letter/DIN 5008 A/recipient/.cd%
-	, rta/.initial=\@empty%
-	, title/.initial=\@empty%
-	, name/.initial=\@empty%
-	, organisation/.initial=\@empty%
-	, position/.initial=\@empty%
-	, street/.initial=\@empty%
-	, house/.initial=\@empty%
-	, zipcode/.initial=\@empty%	
-	, city/.initial=\@empty%
-	, country/.initial=\@empty%
+	/classycv/data/cover letter/us block/recipient/.cd%
+	, title/.initial=?title%
+	, title/.default=?title%
+	, name/.initial=?name%
+	, name/.default=?name%
+	, organisation/.initial=?organisation%
+	, organisation/.default=?organisation%
+	, position/.initial=?position%
+	, position/.default=?position%
+	, street/.initial=?street%
+	, street/.default=?street%
+	, house/.initial=?house%
+	, house/.default=?house%
+	, zipcode/.initial=?zipcode%
+	, zipcode/.default=?zipcode%
+	, city/.initial=?city%
+	, city/.default=?city%
+	, country/.initial=?country%
+	, country/.default=?country%
 }	
 
 \pgfkeys{%
-	/classycv/data/cover letter/DIN 5008 A/.cd%
-	, date/.initial=\today%
-	, date/.default=\today%
-	, subject/.initial=\@empty%
-	, subject/.default=\@empty%
-	, opening/.initial=\@empty%
-	, opening/.default=\@empty%
-	, closing/.initial=\@empty%
-	, closing/.default=\@empty%
+	/classycv/data/cover letter/us block/.cd%
+	, date/.initial=?date%
+	, date/.default=?date%
+	, subject/.initial=?subject%
+	, subject/.default=?subject%
+	, opening/.initial=?opening%
+	, opening/.default=?opening%
+	, closing/.initial=?closing%
+	, closing/.default=?closing%
 }%
 
 \pgfkeys{%
 	/classycv/data/settings/resume/.cd%
-	, format/.initial=\classycv@FORMAT@RESUME@THIRTYSEVENTY%
-	, format/.default=\classycv@FORMAT@RESUME@THIRTYSEVENTY%	
+	, format/.initial=\classycv@FORMAT@RESUME@CLASSIC%
+	, format/.default=\classycv@FORMAT@RESUME@CLASSIC%	
 }
 
+% NOTE Classic resume settings and options
 \pgfkeys{%
-	/classycv/data/resume/Fourty Sixty/options/.cd%
-	, left background color/.initial=accent-color
-	, left background color/.default=accent-color
-	, left foreground color/.initial=nearly-white
-	, left foreground color/.default=nearly-white
-}
+	/classycv/data/settings/resume/classic/.cd%
+	, name/.initial=?name%
+	, name/.default=?name%
+	, title/.initial=?title%
+	, title/.default=?title%
+	, phone/.initial=?phone%
+	, phone/.default=?phone%
+	, email/.initial=?email%
+	, email/.default=?email%
+}%
 
 \pgfkeys{%
-	/classycv/data/resume/Fourty Sixty/.cd%
-	, picture/.initial=\@empty%
-	, name/.initial=\@empty%
-	, birthdate/.initial=\@empty%
-	, marital status/.initial=\@empty%
-	, nationality/.initial=\@empty%
-	, phone/.initial=\@empty%
-	, mobile/.initial=\@empty%
-	, email/.initial=\@empty%
-	, website/.initial=\@empty%
-}
+	/classycv/data/settings/resume/classic/options/.cd%
+	, header basic style/.initial={\robotofamily\fontseries{l}\selectfont\normalsize\MakeUppercase}%
+	, header basic style/.default={\robotofamily\fontseries{l}\selectfont\normalsize\MakeUppercase}%
+	, has header delimiter/.default=yes%
+	, has header delimiter/.initial=yes%
+	, header delimiter color/.initial=light-gray%
+	, header delimiter color/.default=light-gray%
+	, header foreground color/.initial=medium-gray%
+	, header foreground color/.default=medium-gray%
+	, footer basic style/.initial={\robotofamily\fontseries{l}\selectfont\small\MakeUppercase}%
+	, footer basic style/.default={\robotofamily\fontseries{l}\selectfont\small\MakeUppercase}%
+	, footer foreground color/.initial=medium-gray%
+	, footer foreground color/.default=medium-gray%
+	, has footer delimiter/.default=yes%
+	, has footer delimiter/.initial=yes%
+	, footer delimiter color/.initial=light-gray%
+	, footer delimiter color/.default=light-gray%
+}%
 
+% NOTE Modern resume settings and options
 \pgfkeys{%
-	/classycv/data/resume/Thirty Seventy/.cd%
+	/classycv/data/resume/modern/.cd%
 	, picture/.initial=\@empty%
 	, picture/.default=\@empty%
-	, name/.initial=\@empty%
-	, name/.default=\@empty%
-	, title/.initial=\@empty%
-	, title/.default=\@empty%
-	, street/.initial=\@empty%
-	, street/.default=\@empty%
-	, house/.initial=\@empty%
-	, house/.default=\@empty%
-	, zipcode/.initial=\@empty%
-	, zipcode/.default=\@empty%
-	, city/.initial=\@empty%
-	, city/.default=\@empty%
-	, country/.initial=\@empty%
-	, country/.default=\@empty%
-	, birthdate/.initial=\@empty%
-	, birthdate/.default=\@empty%
-	, marital status/.initial=\@empty%
-	, marital status/.default=\@empty%
-	, nationality/.initial=\@empty%
-	, nationality/.default=\@empty%
-	, phone/.initial=\@empty%
-	, phone/.default=\@empty%
-	, mobile/.initial=\@empty%
-	, mobile/.default=\@empty%
-	, email/.initial=\@empty%
-	, email/.default=\@empty%
-	, website/.initial=\@empty%
-	, website/.default=\@empty%
-	, personal data heading text/.initial=\@empty%
-	, personal data heading text/.default=\@empty%
-	, contact data heading text/.initial=\@empty%
-	, contact data heading text/.default=\@empty%
-	, submitter information basic style/.initial={}%
-	, submitter information basic style/.default={}%
+	, name/.initial=?name%
+	, name/.default=?name%
+	, title/.initial=?title%
+	, title/.default=?title%
+	, street/.initial=?street%
+	, street/.default=?street%
+	, house/.initial=?house%
+	, house/.default=?house%
+	, zipcode/.initial=?zipcode%
+	, zipcode/.default=?zipcode%
+	, city/.initial=?city%
+	, city/.default=?city%
+	, country/.initial=?initial%
+	, country/.default=?initial%
+	, birthdate/.initial=?birthdate%
+	, birthdate/.default=?birthdate%
+	, marital status/.initial=?marital status%
+	, marital status/.default=?marital status%
+	, nationality/.initial=?nationality%
+	, nationality/.default=?nationality%
+	, phone/.initial=?phone%
+	, phone/.default=?phone%
+	, mobile/.initial=?mobile%
+	, mobile/.default=?mobile%
+	, email/.initial=?email%
+	, email/.default=?email%
+	, website/.initial=?website%
+	, website/.default=?website%
+	, personal data heading text/.initial=?personal data heading text%
+	, personal data heading text/.default=?personal data heading text%
+	, contact data heading text/.initial=?contact data heading text%
+	, contact data heading text/.default=?contact data heading text%
+%!	, submitter information basic style/.initial=\@empty%
+%!	, submitter information basic style/.default=\@empty%
 }
 
 \pgfkeys{%
-	/classycv/data/resume/Thirty Seventy/options/.cd%
+	/classycv/data/resume/modern/options/.cd%
 	, left basic style/.initial={\robotofamily\fontseries{l}\selectfont\small}%
 	, left basic style/.default={\robotofamily\fontseries{l}\selectfont\small}%
 	, left foreground color/.initial=highlight-color%
 	, left foreground color/.default=highlight-color%
-%	, left name style/.initial={\flafamily\larger[2]\mdseries\scshape\color{highlight-color}}%
-%	, left name style/.default={\flafamily\larger[2]\mdseries\scshape\color{highlight-color}}%	
-%	, left title style/.initial={\flafamily\fontseries{l}\selectfont\larger\color{highlight-color}}%
-%	, left title style/.default={\flafamily\fontseries{l}\selectfont\larger\color{highlight-color}}%	
+	, left background color/.initial=white%
+	, left background color/.default=white%
 	, left address style/.initial={\flafamily\fontseries{l}\selectfont\larger}%
 	, left address style/.default={\flafamily\fontseries{l}\selectfont\larger}%
-	, left header style/.initial={\flafamily\mdseries\large}%
-	, left header style/.default={\flafamily\mdseries\large}%
+	, left header style/.initial={\flafamily\bfseries\larger[2]}%
+	, left header style/.default={\flafamily\bfseries\larger[2]}%
+	, left header color/.initial=accent-color%
+	, left header color/.default=accent-color%
+	, left header label color/.initial=accent-color%
+	, left header label color/.default=accent-color%
 	, left header skip before/.initial={\bigskip}%
 	, left header skip before/.default={\bigskip}%
 	, left entry style/.initial={\robotofamily\fontseries{l}\selectfont\small}%
@@ -2125,49 +2474,22 @@
 	, left entry skip above/.default={}%
 	, left entry skip below/.initial={\smallskip}%
 	, left entry skip below/.default={\smallskip}%
-%	, left additional personal data/.initial=\@empty%
-%	, left additional personal data/.default=\@empty%
-%	, left additional contact data/.initial=\@empty%
-%	, left additional contact data/.default=\@empty%
 	, right basic style/.initial={\robotofamily\fontseries{l}\selectfont\normalsize}%
 	, right basic style/.default={\robotofamily\fontseries{l}\selectfont\normalsize}%	
+	, left title style/.initial={\larger[3]\bfseries}
+	, left title style/.default={\larger[3]\bfseries}
+	, left title name style/.initial={\larger[2]\fontseries{l}\selectfont}
+	, left title name style/.default={\larger[2]\fontseries{l}\selectfont}
 	, right foreground color/.initial=black%
 	, right foreground color/.default=black%
-%	, content lines style/.initial={\lmrfamily\larger}%
-%	, content lines style/.default={\lmrfamily\fontseries{l}\selectfont\larger}%
-	, delimiter color/.initial=highlight-color
-	, delimiter color/.default=highlight-color
+	, delimiter color/.initial=highlight-color%
+	, delimiter color/.default=highlight-color%
+	, delimiter width/.initial=2pt%
+	, delimiter width/.default=2pt%
 }
 
-% TODO remove?
-\iffalse
 %
-%! Twenty Eighty resume data
-%
-\pgfkeys{%
-	/classycv/data/resume/Twenty Eighty/options/.cd%
-	, left background color/.initial=accent-color%
-	, left background color/.default=accent-color%
-	, left foreground color/.initial=nearly-white%
-	, left foreground color/.default=nearly-white%
-}
-
-\pgfkeys{%
-	/classycv/data/resume/Twenty Eighty/.cd%
-	, picture/.initial=\@empty%
-	, name/.initial=\@empty%
-	, birthdate/.initial=\@empty%
-	, marital status/.initial=\@empty%
-	, nationality/.initial=\@empty%
-	, phone/.initial=\@empty%
-	, mobile/.initial=\@empty%
-	, email/.initial=\@empty%
-	, website/.initial=\@empty%
-}
-\fi 
-
-%
-%! Attachment data
+% Attachment data
 %
 \pgfkeys{%
 	/classycv/data/attachment/.cd%
@@ -2186,24 +2508,17 @@
 	, text style/.default={\robotofamily}%
 }
 
-
 % NOTE Page geometry definitions.
 
 \geometry{}
 \savegeometry{default}
 
 %%
-% Blank page geomtery with margins are added for printing.
+% Blank page geomtery with added margins for printing.
 %%
-\newlength{\classycv@GEOMETRY@BLANK@TMARGIN}
-\setlength{\classycv@GEOMETRY@BLANK@TMARGIN}{5mm}
-\newlength{\classycv@GEOMETRY@BLANK@RMARGIN}
-\setlength{\classycv@GEOMETRY@BLANK@RMARGIN}{5mm}
-\newlength{\classycv@GEOMETRY@BLANK@BMARGIN}
-\setlength{\classycv@GEOMETRY@BLANK@BMARGIN}{5mm}
-\newlength{\classycv@GEOMETRY@BLANK@LMARGIN}
-\setlength{\classycv@GEOMETRY@BLANK@LMARGIN}{5mm}
-
+\newlength{\classycv@GEOMETRY@BLANK@MARGIN}
+%!\setlength{\classycv@GEOMETRY@BLANK@MARGIN}{5mm}
+\setlength{\classycv@GEOMETRY@BLANK@MARGIN}{0pt}
 \newgeometry{%
 	% Ignore header, footer, margin par
 	noheadfoot%
@@ -2212,10 +2527,10 @@
 	, width=\paperwidth%
 	, height=\paperheight%
 %	, headheight=0pt%
-	, tmargin=\classycv@GEOMETRY@BLANK@TMARGIN%
-	, rmargin=\classycv@GEOMETRY@BLANK@RMARGIN%
-	, bmargin=\classycv@GEOMETRY@BLANK@BMARGIN%
-	, lmargin=\classycv@GEOMETRY@BLANK@LMARGIN%
+	, tmargin=\classycv@GEOMETRY@BLANK@MARGIN%
+	, rmargin=\classycv@GEOMETRY@BLANK@MARGIN%
+	, bmargin=\classycv@GEOMETRY@BLANK@MARGIN%
+	, lmargin=\classycv@GEOMETRY@BLANK@MARGIN%
 }
 \savegeometry{blank}
 
@@ -2239,6 +2554,75 @@
 	, height=\the\paperheight%
 }
 \savegeometry{din-5008-a}
+
+%%
+% US business cover letter page geometry.
+%
+% HREF https://en.wikipedia.org/wiki/Business_letter
+% HREF https://www.linkedin.com/pulse/british-american-business-letters-differences-types-academy-bea-
+%%
+\newlength{\classycv@GEOMETRY@USBLOCK@MARGIN}
+\setlength{\classycv@GEOMETRY@USBLOCK@MARGIN}{1in}
+\newlength{\classycv@GEOMETRY@USBLOCK@FOOTERHEIGHT}
+\setlength{\classycv@GEOMETRY@USBLOCK@FOOTERHEIGHT}{2\baselineskip}
+\newgeometry{%
+	% Ignore header
+	nohead
+	, includefoot%
+	, nomarginpar%
+	, foot=0pt%
+	, footskip=\dimexpr0.5\classycv@GEOMETRY@USBLOCK@MARGIN\relax%
+	, tmargin=\classycv@GEOMETRY@USBLOCK@MARGIN%
+	, rmargin=\classycv@GEOMETRY@USBLOCK@MARGIN%
+	% Add up bottom margin and footer height to properly space content and footer.
+	, bmargin=\dimexpr\classycv@GEOMETRY@USBLOCK@MARGIN + \dimexpr\classycv@GEOMETRY@USBLOCK@FOOTERHEIGHT\relax%
+	, lmargin=\classycv@GEOMETRY@USBLOCK@MARGIN%
+	, width=\dimexpr\paperwidth-\dimexpr2\classycv@GEOMETRY@USBLOCK@MARGIN%
+	, height=\dimexpr\paperheight-\dimexpr2\classycv@GEOMETRY@USBLOCK@MARGIN%
+}
+\savegeometry{us-business-cover-letter}
+
+%%
+% Classic resume page format
+% HREF https://resumegenius.com/how-to-write-a-resume/resume-fonts-margins-paper-guidelines (for margins)
+%%
+\newlength{\classycv@GEOMETRY@RESUMECLASSIC@HEADFOOTSKIP}
+\setlength{\classycv@GEOMETRY@RESUMECLASSIC@HEADFOOTSKIP}{0.1in}
+\newlength{\classycv@GEOMETRY@RESUMECLASSIC@LEFTRIGHTMARGIN}
+\setlength{\classycv@GEOMETRY@RESUMECLASSIC@LEFTRIGHTMARGIN}{0.63in}
+\newlength{\classycv@GEOMETRY@RESUMECLASSIC@TOPBOTTOMMARGIN}
+\setlength{\classycv@GEOMETRY@RESUMECLASSIC@TOPBOTTOMMARGIN}{1in}
+\newlength{\classycv@GEOMETRY@RESUMECLASSIC@HEADERHEIGHT}
+\setlength{\classycv@GEOMETRY@RESUMECLASSIC@HEADERHEIGHT}{1.5\baselineskip}
+\newlength{\classycv@GEOMETRY@RESUMECLASSIC@FOOTERHEIGHT}
+\setlength{\classycv@GEOMETRY@RESUMECLASSIC@FOOTERHEIGHT}{1.5\baselineskip}
+
+\newgeometry{%
+	includeheadfoot%
+	, nomarginpar%
+	, headheight=\classycv@GEOMETRY@RESUMECLASSIC@HEADERHEIGHT%
+	, headsep=\classycv@GEOMETRY@RESUMECLASSIC@HEADFOOTSKIP%
+	% Add up footer skip and footer height to properly space bottom of footer from bottom of content box.
+	, footskip=\dimexpr\classycv@GEOMETRY@RESUMECLASSIC@HEADFOOTSKIP + \classycv@GEOMETRY@RESUMECLASSIC@FOOTERHEIGHT\relax%
+	, tmargin=\classycv@GEOMETRY@RESUMECLASSIC@TOPBOTTOMMARGIN%
+	, rmargin=\classycv@GEOMETRY@RESUMECLASSIC@LEFTRIGHTMARGIN%
+	, bmargin=\classycv@GEOMETRY@RESUMECLASSIC@TOPBOTTOMMARGIN%
+	, lmargin=\classycv@GEOMETRY@RESUMECLASSIC@LEFTRIGHTMARGIN%
+}
+\savegeometry{resume-classic}
+
+\newpagestyle{resume-classic}{%
+	\setheadrule{0pt}%
+	\setfootrule{0pt}%
+	\sethead{%
+		% Increase the cover letter page counter.
+		%\stepcounter{classycv@coverLetterPageCounter}%	
+		\classycv@PutComponent{/resume/header}%
+	}{}{}%
+	\setfoot{%
+		\classycv@PutComponent{/resume/footer}%
+	}{}{}%
+}
 
 %%
 % Attachment geometry.
@@ -2296,14 +2680,15 @@
 \tcbuselibrary{breakable}
 \tcbuselibrary{skins}
 
+% NOTE Obnoxious and totally unwarranted self advertisement (:
 \AtEndDocument{%
-\cleardoublepage%
-\clearpage%
-\newpage%
-\pagestyle{empty}%
-\vspace*{\fill}%
-	\begin{center}
-		\Huge\flafamily\fontseries{l}\selectfont Made with package \textcolor{accent-color}{\bfseries classycv} for \LaTeX2e
-	\end{center}%
-\vspace*{\fill}%
+	\cleardoublepage%
+	\clearpage%
+	\newpage%
+	\pagestyle{empty}%
+	\vspace*{\fill}%
+		\begin{center}
+			\Huge\flafamily\fontseries{l}\selectfont Made with package \textcolor{accent-color}{\bfseries classycv} for \LaTeX2e
+		\end{center}%
+	\vspace*{\fill}%
 }

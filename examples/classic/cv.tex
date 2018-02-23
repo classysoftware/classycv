@@ -8,7 +8,7 @@
 \documentclass[a4paper, 12pt]{classycv}
 
 %
-%! dependencies
+% dependencies
 %
 \usepackage[ngerman]{babel}
 \usepackage[utf8]{inputenc}
@@ -18,7 +18,14 @@
 \usepackage{soul}
 
 %
-%! document
+% settings
+%
+
+% Choose classic resume format.
+\classycvSet{/settings/resume/format}{classic}
+
+%
+% document
 %
 \begin{document}
 
@@ -32,11 +39,8 @@
 	, street=Musterstraße%
 	, house=35%
 	, city=Berlin%
-	, zipcode=10000%
+	, zipcode=10000% 
 	, country=Deutschland%
-	, phone=+49 (0) XXXX / XXX XX XX%
-	, mobile=+49 (0) XXXX/ XXX XX XX%
-	, email=XXXXX@XXXXX.de%
 	, attachments={Referenzen: Zeugnisse der drei Praktika, Abiturzeugnis}
 }{% recipient information
 	, organisation=Deutsche Bahn AG%
@@ -53,18 +57,11 @@
 %%
 \begin{Resume}{%
 	name=Lara Muster%
-	, title=Lebenslauf%
-	, birthdate={05/08/1986}%
-	, nationality=deutsch%
-	, phone=+49 (0) XXXX / XXX XX XX%
-	, mobile=+49 (0) XXXX/ XXX XX XX%
-	, email=XXXXX@XXXXX.de%
-	, personal data heading text={\MakeUppercase{Über Mich}}%
-	, contact data heading text={\MakeUppercase{Kontakt}}%
 }%
+%%
 % experience
-\heading[has label=yes, label position=left, label text=\faSuitcase, label color=accent-color, skip above=2em, skip below=0em, skip between=0.5em]{%
-    \MakeUppercase{Berufserfahrung}}%
+%%
+\heading[padding=0pt, skip above=\baselineskip, skip below=\baselineskip]{\circle[border width=0pt, border color=accent-color, background color=accent-color, text color=white]{\faWrench}~~Arbeitserfahrung}%
 %
 \begin{Entry}{%
     \color{accent-color}\fontseries{l}\selectfont01/06/2007–Heute%
@@ -101,9 +98,11 @@
         \item Mithilfe bei der Terminplanung und Organisation im Reisebüroalltag.
     \end{List}
 \end{Entry}
+%%
 % education
-\newpage%
-\heading[has label=yes, label position=left, label text=\faGraduationCap, label color=accent-color, skip above=2em, skip below=0em, skip between=0.5em]{\MakeUppercase{Ausbildung}}
+%%
+\newpage
+\heading[padding=0pt, skip above=\baselineskip, skip below=\baselineskip]{\circle[border width=0pt, border color=accent-color, background color=accent-color, text color=white]{\faGraduationCap}~~Ausbildung}%
 %
 \begin{Entry}{09/1996 --- 08/2005}{%
     \textbf{Abitur}\hfill EQF Niveau 3\\\textit{Robert-Muster-Gymnasium}, Marburg%
@@ -116,12 +115,10 @@
         \item Informatik
     \end{List}
 \end{Entry}
+% 
+\heading[padding=0pt, skip above=0pt, skip below=\baselineskip]{\circle[border width=0pt, border color=accent-color, background color=accent-color, text color=white]{\faUser}~~Persönliche Fähigkeiten}%
 %
-\heading[has label=yes, label position=left, label text=\faWrench, label color=accent-color, skip above=2em, skip below=0em, skip between=0.5em]{\MakeUppercase{Persönliche Fähigkeiten}}
-%
-\begin{Entry}{%
-    Sprachkenntnisse%
-}{}%
+\begin{Entry}{Sprachkenntnisse}{}%
     \textbf{Muttersprache}: Deutsch%
     \begin{Table}[column format={%
         C{0.15\linewidth-2\tabcolsep-\arrayrulewidth}%
@@ -140,12 +137,10 @@
         \\\cline{2-6} Spa\-nisch & B1 & A2 & A2 & A2 & B1
         \\\cline{2-6}
     \end{Table}
-    {\footnotesize A1/2: elementare Sprachverwendung - B1/2: selbstständige Sprachverwendung - C1/2: kompetente Sprachverwendung}
-    \\{\footnotesize GT: An Gesprächen teilnehmen; ZS: zusammenhängendes Sprechen}
-    \\{\footnotesize\href{http://europass.cedefop.europa.eu/de/resources/european-language-levels-cefr}{\ul{Gemeinsamer Europ\"aischer Referenzrahmen f\"ur Sprachen}}}
+    {\footnotesize A1/2: elementare Sprachverwendung - B1/2: selbstständige Sprachverwendung - C1/2: kompetente Sprachverwendung}; {\footnotesize GT: An Gesprächen teilnehmen; ZS: zusammenhängendes Sprechen}; {\footnotesize\href{http://europass.cedefop.europa.eu/de/resources/european-language-levels-cefr}{\ul{Gemeinsamer Europ\"aischer Referenzrahmen f\"ur Sprachen}}}
 \end{Entry}
 %
-\begin{Entry}[skip above=\baselineskip, skip below=0pt]{Kommunikative Fähigkeiten}{}%
+\begin{Entry}{Kommunikative Fähigkeiten}{}%
     \begin{List}[skip above=0pt]%
         \item Teamgeist 
         \item Freude am Umgang mit Menschen aller Nationalitäten
@@ -159,12 +154,11 @@
 Reisestellen der beiden Unternehmen sehr geschätzt wurde.
 \end{Entry}
 %
-\newpage%
 \begin{Entry}{Berufliche Fähigkeiten}{}%
     Teilnahme an Volkshochschulkursen der VHS Marburg: 
     \begin{List}[skip above=0pt]%
         \item ``Wie präsentiere ich überzeugend?'' (2006)
-        \item ``Rhetorik für junge Leute'' (2007
+        \item ``Rhetorik für junge Leute'' (2007)
     \end{List}
 \end{Entry}
 %
@@ -183,7 +177,7 @@ Reisestellen der beiden Unternehmen sehr geschätzt wurde.
     B%
 \end{Entry}
 %
-\heading[has label=yes, label position=left, label text=\faInfo, label color=accent-color, skip above=2em, skip below=0em, skip between=0.5em]{\MakeUppercase{Zusätzliche Informationen}}
+\heading[border width=1pt, padding=0pt, skip above=\baselineskip, skip below=\baselineskip]{\circle[border width=0pt, border color=accent-color, background color=accent-color, text color=white]{\faInfo}~~Zusätzliche Informationen}%
 %
 \begin{Entry}{Mitgliedschaften}{}%
     \begin{List}[skip above=0pt]%
@@ -191,14 +185,9 @@ Reisestellen der beiden Unternehmen sehr geschätzt wurde.
         \item Trainerin der Kindergruppe im Sportverein TUS Magdeburg e.V.
     \end{List}
 \end{Entry}
-%
+% 
 \begin{Entry}{Referenzen}{}%
     Zeugnisse der drei Praktika- Abiturzeugnis
 \end{Entry}
 \end{Resume}
-% Anlagen
-% NOTE multi-page attachment 
-%   \attachment[attachment name=Anhang: <Anhang1>][][height=0.85\paperheight]{<Anhang1>}
-% NOTE single page attachment
-%   \attachment[attachment name=Anhang: <Anhang2>][has page counter=no][height=0.85\paperheight]{<Anhang2>}
 \end{document}

@@ -1,0 +1,1 @@
+/Users/main/Documents/Workspace/classycv/source/classycv.cls

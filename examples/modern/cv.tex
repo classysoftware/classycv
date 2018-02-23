@@ -1,0 +1,129 @@
+%%
+% CV example using us business letter format for the cover letter and "modern" format for the resume.
+%%
+\documentclass[a4paper, 12pt]{classycv}
+
+%
+%! dependencies
+%
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+%\usepackage{layout}
+\usepackage{blindtext}
+%\usepackage{lipsum}
+%\usepackage[normalem]{ulem}
+\usepackage{enumitem}
+\usepackage{soul}
+
+% NOTE settings
+\makeatletter
+\classycvDefineComponent{/resume/left/extra data}{%
+    \pgfkeys{/classycv/data/resume/modern/options/left header style/.get=\headerStyle}%
+    \pgfkeys{/classycv/data/put progress bar/options/.cd%
+        , width=\dimexpr\linewidth-24pt\relax%
+        , height=\dimexpr0.5\baselineskip\relax%
+        , border color=highlight-color%
+        , border width=0pt%
+        , background color=medium-gray%
+        , foreground color=highlight-color%
+    }%
+	% NOTE Parameters handed down need to be expanded first.
+	\edef\@@headerColor{\pgfkeysvalueof{/classycv/data/resume/modern/options/left header color}}%
+	\edef\@@backgroundColor{\pgfkeysvalueof{/classycv/data/resume/modern/options/left background color}}%
+    \heading[%
+        , width=\dimexpr\linewidth-12pt\relax%
+        , skip above=2\baselineskip%
+        , skip below=\baselineskip%
+        , skip left=12pt%
+        , basic style=\pgfkeysvalueof{/classycv/data/resume/modern/options/left header style}%
+        , foreground color=\@@headerColor%
+        , background color=\@@backgroundColor%
+        , border width=0pt%
+        , border color=accent-color%
+        , padding=0pt%
+    ] {\circle[border width=2pt]\faWrench~~\MakeUppercase{Skills}}%
+	\hspace*{24pt}%
+	\begin{varwidth}{\linewidth-24pt}%
+        \newcommand{\@@barHeaderStyle}{\fontseries{l}\selectfont\itshape}
+        {\@@barHeaderStyle Adobe InDesign}\\%
+        \progress{80}\\[0.5\baselineskip]%
+        {\@@barHeaderStyle Adobe Photoshop}\\%
+        \progress{90}\\[0.5\baselineskip]%
+        {\@@barHeaderStyle Adobe Illustrator}\\%
+        \progress{85}\\[0.5\baselineskip]%
+        {\@@barHeaderStyle HTML \& CSS}\\%
+        \progress{75}\\[0.5\baselineskip]%
+    \end{varwidth}%
+}
+\makeatother
+
+% % % % % %
+% document %
+% % % % % %
+\begin{document}
+
+% Choose US business letter and modern resume format.
+\classycvSet{/settings/cover letter/format}{us-block}
+\classycvSet{/settings/resume/format}{modern}
+
+\begin{CoverLetter}{%
+    name=John Smith%
+    , organisation=%
+    , position=%
+    , date=\today%
+    , attachments=%
+}{%
+    name=Frank Miller%
+}{application}{Dear Mr. Miller:}{Best Regards,}%
+    \blindtext[1]
+
+    \blindtext[3]
+
+    \blindtext[2]
+\end{CoverLetter}
+
+\begin{Resume}[%
+    left background color=accent-color%
+    , left foreground color=white%
+    , left header color=white%
+    , delimiter color=white%
+    , delimiter width=0pt%
+]{%
+    name=John Smith%
+    , picture={avatar_transparent_bg}%
+    , title=Graphic Designer%
+    , personal data heading text={\MakeUppercase{about me}}%
+    , contact data heading text={\MakeUppercase{contact me}}%
+}%
+    \heading[padding=0pt, skip above=2\baselineskip, skip below=\baselineskip]{\circle[border width=2pt]{\faSuitcase}~~Professional Experience}%
+    \begin{Entry}[skip above=0pt]{\textit{\MakeUppercase{IT Group}}\\Melbourne, AU}{Lead Web Developer~(June 2012 --- Current)}%
+        Hello, here is some text without a meaning. This text should show what a printed text will look like at this place.%
+    \end{Entry}%
+    \begin{Entry}[skip above=0pt]{\textit{\MakeUppercase{IT Group}}\\Melbourne, AU}{Lead Web Developer~(June 2012 --- Current)}%
+        If you read this text, you will get no information. Really? Is there no information? Is there a difference between this text and some nonsense like “Huardest gefburn”?%
+    \end{Entry}%
+    %
+    \heading[padding=0pt, skip above=1\baselineskip, skip below=\baselineskip]{\circle[border width=2pt]{\faGraduationCap}~~Education}%
+    \begin{Entry}[skip above=0pt]{\textit{\MakeUppercase{University of California}} (2004 --- 2006)}{Master in Digital Arts}%
+        Kjift – not at all! A blind text like this gives you information about the selected font, how the letters are written and an impression of the look.%
+    \end{Entry}%
+    \begin{Entry}[skip above=0pt]{\textit{\MakeUppercase{Amsterdam University of Art}} (2001 --- 2004)}{Bachelor in Graphic Design}%
+        This text should contain all letters of the alphabet and it should be written in of the original language.%
+    \end{Entry}%
+    \begin{Entry}[skip above=0pt]{\textit{\MakeUppercase{London College of Art}} (1999 --- 2001)}{Secondary School}%
+        There is no need for special content, but the length of words should match the language.%
+    \end{Entry}%
+    %
+    \heading[padding=0pt, skip above=\baselineskip, skip below=\baselineskip]{\circle[border width=2pt]{\faTrophy}~~Awards~\&~Achievements}%
+    \begin{List}[skip above=0pt, skip below=0pt]
+        \item Interview for \textit{Smashingmagazine}, April 2007%
+        \item Webmaster award at \textit{Master Me}, September 2003%
+        \item \textit{Golden Web Awards} winner%
+        \item \textit{American Design Awards} winner%
+    \end{List}%
+\end{Resume}
+    
+
+\end{document}
