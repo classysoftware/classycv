@@ -819,20 +819,19 @@
 		, date line style/.get=\dateLineStyle%
 		, topic line style/.get=\topicLineStyle%
 		, skip above/.get=\skipAbove%
-		, skip between/.get=\skipBetween%
+		, skip right/.get=\skipRight%
 		, skip below/.get=\skipBelow%
 		, skip left/.get=\skipLeft%
-		, skip right/.get=\skipRight%
+		, skip between/.get=\skipBetween%
 	}%
-	\ifdim\skipAbove=0pt\else\vspace*{\skipBelow}\par\fi%
-	\begin{adjustbox}{minipage={\dimexpr\linewidth-\dimexpr\skipLeft+\skipRight\relax}, margin=\skipLeft 0pt \skipRight 0pt}%
+	% NOTE Using commands in adjustbox's "margin" parmeter requires curly braces with delimiting spaces.
+	\begin{adjustbox}{minipage={\dimexpr\linewidth-\dimexpr\skipLeft+\skipRight\relax}, padding=0pt, margin={\skipLeft} {\skipAbove} {\skipRight} {\skipBelow}}%
 		{\dateLineStyle{#2}\par}%
 		{\topicLineStyle{#3}\par}%
 		\vspace*{\skipBetween}%
 		\basicStyle%
 }{%
-	\end{adjustbox}%
-	\ifdim\skipBelow=0pt\par\else\vspace*{\skipBelow}\par\fi%
+	\end{adjustbox}\par%
 	\egroup%
 }
 
