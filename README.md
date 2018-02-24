@@ -158,7 +158,7 @@ This format left aligns the whole letter and adds a bold subject line after the 
 > **NOTE**:
 > You can select the US business letter (block format) by adding
 > ```latex
-> \classycvSet{/settings/resume/format}{us-block}
+> \classycvSet{/settings/cover letter/format}{us-block}
 > ```
 > to your document preamble.
 
@@ -170,7 +170,7 @@ DIN 5008 A format positions the address field such that the address field is sho
 > **NOTE**:
 > You can select DIN 5008 A format for your cover letter format by adding
 > ```latex
-> \classycvSet{/settings/resume/format}{din-5008-a}
+> \classycvSet{/settings/cover letter/format}{din-5008-a}
 > ```
 > to your document preamble.
 
@@ -339,6 +339,9 @@ Output samples are provided below.
 ### FIRST PAGE OF RESUME
 > ![](examples/classic/resume_p1.png)
 
+### ATTACHMENTS FIRST PAGE
+> ![](examples/classic/attachments_p1.png)
+
 ## MODERN CV EXAMPLE
 This is an english cv using the *US business letter* format for the cover letter and the *modern* resume format.
 
@@ -354,3 +357,6 @@ Output samples are provided below.
 
 ### FIRST PAGE OF RESUME
 > ![](examples/modern/resume_p1.png)
+
+### ATTACHMENTS FIRST PAGE
+> ![](examples/modern/attachments_p1.png)

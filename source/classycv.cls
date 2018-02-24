@@ -18,7 +18,7 @@
 	% This parameter has to be set in order for `\loadgeometry` to actually change the layout.
 	pass%
 	, margin=0pt%
-%!  , showframe%
+  	%!, showframe%
 ]{geometry}
 \RequirePackage{titleps}
 \RequirePackage{tikz}
@@ -438,14 +438,15 @@
 	\pagestyle{attachment}%
 	\loadgeometry{attachment}%
 	\clearpage%
-	% Draw included pdf.
+	% Calculate pdf height.
+	\setlength{\classycv@@lI}{\dimexpr\textheight-\classycv@GEOMETRY@ATTACHMENT@FOOTERHEIGHT}%
 	% Were PDF options passed?
-	\ifnum\pdf@strcmp{#3}{\@empty}=\z@
+	\ifnum\pdf@strcmp{#3}{\@empty}=\z@%
 		% No: don't pass to `includepdf`.
-		\includepdf[pages={1-}, height=\paperheight-10mm, keepaspectratio, pagecommand={\pagestyle{attachment}}]{#4}%
+		\includepdf[height=\classycv@@lI, keepaspectratio, pages={1-}, pagecommand={\pagestyle{attachment}}]{#4}%
 	\else%
 		% Yes: pass to `includepdf`.
-		\includepdf[pages={1-}, height=\paperheight-10mm, keepaspectratio, pagecommand={\pagestyle{attachment}}, #3]{#4}%
+		\includepdf[height=\classycv@@lI, keepaspectratio, pages={1-}, pagecommand={\pagestyle{attachment}}, #3]{#4}%
 	\fi%
 	% Label last page (to be able to calculate the attachment page count).
 	\label{attachment-\theclassycv@attachmentCounter-last-page}%
@@ -967,8 +968,10 @@
 		}%
 		\begin{tikzpicture}%
 			\draw[draw=none, use as bounding box] rectangle (210mm, 27mm);%
-			\coordinate (P1) at (20mm, 0);%
-			\node[above right=0pt and 0pt of P1, inner sep=0pt, outer sep=0pt, text width=170mm] {%
+			% NOTE 25mm left shift aligns header with recipient information box.
+			\coordinate (P1) at (25mm, 0);%
+			% NOTE text width is reduced by 5mm from 170mm to align with right edge of text content box.
+			\node[above right=0pt and 0pt of P1, inner sep=0pt, outer sep=0pt, text width=165mm] {%
 				\expandafter\color\expandafter{\fg}\basicStyle%
 				\setlength{\tabcolsep}{0pt}%
 				\begin{tabular*}{\linewidth}{L{0.4\dimexpr\linewidth-2\tabcolsep\relax} L{0.6\dimexpr\linewidth-2\tabcolsep\relax}}%
@@ -1853,32 +1856,34 @@
 	\bgroup%
 	\pgfkeys{%
 		/classycv/data/attachment/.cd%
-		, submitter name/.get=\submitterName%
-		, attachment name/.get=\attachmentName%
+		, name/.get=\attachmentName%
 	}%
 	\pgfkeys{%
 		/classycv/data/attachment/options/.cd%
 		, has page counter/.get=\hasPageCounter%
 		, background color/.get=\bg%
 		, foreground color/.get=\fg%
-		, text style/.get=\textStyle%
+		, basic style/.get=\basicStyle%
 	}%
-	\setlength{\classycv@@lI}{\dimexpr\paperwidth-\dimexpr\classycv@GEOMETRY@BLANK@MARGIN+\classycv@GEOMETRY@BLANK@MARGIN}%
-	\setlength{\classycv@@lII}{\dimexpr20mm}%
+	% TODO parameterize?
+	\def\@@lineWidth{2pt}%
+	\setlength{\classycv@@lI}{\dimexpr\classycv@GEOMETRY@ATTACHMENT@FOOTERHEIGHT\relax}%
+	% Calculate depth.
 	\tikz{%
-		\draw[use as bounding box, draw=none] rectangle (\paperwidth, 20mm);%
-		\draw[draw=highlight-color, thick, opacity=0.5] (\classycv@GEOMETRY@BLANK@MARGIN, \classycv@@lII) -- (\classycv@@lI, \classycv@@lII);%
-		\node[minimum width=\classycv@@lI, text width=\classycv@@lI, inner sep=0pt, outer sep=0pt, below right=\classycv@GEOMETRY@BLANK@MARGIN and \classycv@GEOMETRY@BLANK@MARGIN of current bounding box.north west]{%
-			\begin{tabular}{m{0.9\dimexpr\linewidth-24pt\relax-\tabcolsep} R{0.1\dimexpr\linewidth-24pt\relax-\tabcolsep}}%
-				\ifnum\pdf@strcmp{\@empty}{\attachmentName}=\z@\else%
-					\textStyle{\bfseries\faFilesO}~\attachmentName%
-				\fi%
-				& \ifnum\pdf@strcmp{yes}{\hasPageCounter}=\z@%
-					\setcounter{classycv@@cI}{\getpagerefnumber{attachment-\theclassycv@attachmentCounter-first-page}}%
-					\setcounter{classycv@@cII}{\getpagerefnumber{attachment-\theclassycv@attachmentCounter-last-page}}%
-					\textStyle\number\numexpr1 + \thepage - \theclassycv@@cI\relax~|~\number\numexpr\theclassycv@@cII-\theclassycv@@cI\relax%
-				\fi%
-			\end{tabular}%
+		\draw[use as bounding box, draw=none, fill=\bg] rectangle (\paperwidth, \classycv@GEOMETRY@ATTACHMENT@FOOTERHEIGHT);%
+		\draw[draw=none, fill=highlight-color] (0, \dimexpr\classycv@@lI-\@@lineWidth\relax) rectangle (\textwidth, \classycv@@lI);%
+		\node[draw=none, minimum width=\paperwidth, text width=\paperwidth, text height=\dimexpr0.50\classycv@@lI\relax, text depth=\dimexpr0.50\classycv@@lI\relax, inner sep=0pt, outer sep=0pt, below right=\dimexpr\@@lineWidth\relax and 0pt of current bounding box.north west]{%
+			\hspace*{\baselineskip}%
+			\ifnum\pdf@strcmp{\@empty}{\attachmentName}=\z@\else%
+				\expandafter\color\expandafter{\fg}\basicStyle{\bfseries\faFilesO}~\attachmentName%
+			\fi%
+			\hfill%
+			\ifnum\pdf@strcmp{yes}{\hasPageCounter}=\z@%
+				\setcounter{classycv@@cI}{\getpagerefnumber{attachment-\theclassycv@attachmentCounter-first-page}}%
+				\setcounter{classycv@@cII}{\getpagerefnumber{attachment-\theclassycv@attachmentCounter-last-page}}%
+				\expandafter\color\expandafter{\fg}\basicStyle{\number\numexpr1 + \thepage - \theclassycv@@cI\relax~|~\number\numexpr\theclassycv@@cII-\theclassycv@@cI\relax}%
+			\fi%
+			\hspace*{\baselineskip}%
 		};%
 	}%
 	\egroup%
@@ -2278,8 +2283,8 @@
 	, submitter information email style/.default=%{\robotofamily\fontseries{m}\selectfont}%
 	, date line style/.initial={\robotofamily\fontseries{l}\selectfont\normalsize}%
 	, date line style/.default={\robotofamily\fontseries{l}\selectfont\normalsize}%
-	, subject line style/.initial={\lmrfamily\bfseries\normalsize\MakeUppercase}%
-	, subject line style/.default={\lmrfamily\bfseries\normalsize\MakeUppercase}%
+	, subject line style/.initial={\robotofamily\normalsize\bfseries\MakeUppercase}%
+	, subject line style/.default={\robotofamily\normalsize\bfseries\MakeUppercase}%
 	, opening line style/.initial={\lmrfamily\normalsize}%
 	, opening line style/.default={\lmrfamily\normalsize}%
 	, content style/.initial={\lmrfamily\normalsize}%
@@ -2493,8 +2498,8 @@
 %
 \pgfkeys{%
 	/classycv/data/attachment/.cd%
-	, submitter name/.initial=\@empty%
-	, attachment name/.initial=\@empty%
+	, name/.initial=\@empty%
+	, name/.default=\@empty%
 }
 
 \pgfkeys{%
@@ -2502,10 +2507,10 @@
 	, has page counter/.initial=yes%
 	, background color/.initial=accent-color%
 	, background color/.default=accent-color%
-	, foreground color/.initial=highlight-color%
-	, foreground color/.default=highlight-color%
-	, text style/.initial={\robotofamily}%
-	, text style/.default={\robotofamily}%
+	, foreground color/.initial=white%
+	, foreground color/.default=white%
+	, basic style/.initial={\robotofamily\fontseries{l}\selectfont\footnotesize}%
+	, basic style/.default={\robotofamily\fontseries{l}\selectfont\footnotesize}%
 }
 
 % NOTE Page geometry definitions.
@@ -2627,14 +2632,21 @@
 %%
 % Attachment geometry.
 %%
+\newlength{\classycv@GEOMETRY@ATTACHMENT@FOOTERHEIGHT}
+\setlength{\classycv@GEOMETRY@ATTACHMENT@FOOTERHEIGHT}{15mm}
+\newlength{\classycv@GEOMETRY@ATTACHMENT@FOOTSKIP}
+\setlength{\classycv@GEOMETRY@ATTACHMENT@FOOTSKIP}{5mm}
 \newgeometry{%
-	includeheadfoot%
+	includefoot%
 	, nomarginpar%
 	, headheight=0pt%
 	, headsep=0pt%
 	, foot=0pt%
-	, footskip=0mm%
-	, bmargin=20mm%
+	, footskip=\dimexpr\classycv@GEOMETRY@ATTACHMENT@FOOTERHEIGHT+\classycv@GEOMETRY@ATTACHMENT@FOOTSKIP\relax%
+	, tmargin=0pt%
+	, rmargin=0pt%
+	, bmargin=0pt%
+	, lmargin=0pt%
 	, width=\the\paperwidth%
 	, height=\the\paperheight%
 }
@@ -2682,9 +2694,9 @@
 
 % NOTE Obnoxious and totally unwarranted self advertisement (:
 \AtEndDocument{%
-	\cleardoublepage%
 	\clearpage%
 	\newpage%
+	\loadgeometry{blank}%
 	\pagestyle{empty}%
 	\vspace*{\fill}%
 		\begin{center}
