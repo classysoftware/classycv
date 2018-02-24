@@ -1618,7 +1618,7 @@
 	% Set left component width.
 	\setlength{\classycv@@lI}{\dimexpr0.7\textwidth}%
 	\setlength{\classycv@@lII}{\dimexpr0.3\textwidth}%
-	\setlength{\classycv@@lIII}{\dimexpr\paperheight-2\classycv@GEOMETRY@BLANK@MARGIN}%
+	\setlength{\classycv@@lIII}{\dimexpr\classycv@@lII-\delimiterWidth\relax}%
 	% Set page geometry and style; clear page.
 	\loadgeometry{blank}%
 	\pagestyle{blank}%
@@ -1642,20 +1642,20 @@
         , break at=\textheight%
         % Draw left page side as overlay.
 		, overlay unbroken and first={%	
-			\draw[fill=\leftBg, draw=none, use as bounding box] rectangle (\classycv@@lII, \classycv@@lIII);%
+			\draw[fill=\leftBg, draw=none, use as bounding box] rectangle (\classycv@@lII, \paperheight);%
 			\node[draw=none, text width=\classycv@@lII, below right=0pt and 0pt of current bounding box.north west, outer sep=0pt, inner sep=0pt]{%
 				\classycv@PutComponent{/resume/left}%
 			};%
 			% Draw delimiting vertical line.
-			\draw[draw=\delimiterColor, line width=\delimiterWidth, opacity=0.25] (\dimexpr\classycv@@lII+\classycv@GEOMETRY@BLANK@MARGIN, \classycv@GEOMETRY@BLANK@MARGIN) -- (\dimexpr\classycv@@lII+\classycv@GEOMETRY@BLANK@MARGIN, \classycv@@lIII);%
+			\draw[draw=\delimiterColor, line width=\delimiterWidth] (\dimexpr\classycv@@lIII, 0) rectangle (\classycv@@lII, \paperheight);%
 		}%
 		, overlay middle and last={%
-			\draw[fill=\leftBg, draw=none, use as bounding box] rectangle (\classycv@@lII, \classycv@@lIII);%
+			\draw[fill=\leftBg, draw=none, use as bounding box] rectangle (\classycv@@lII, \paperheight);%
 			\node[draw=none, text width=\classycv@@lII, below right=0pt and 0pt of current bounding box.north west, outer sep=0pt, inner sep=0pt]{%
 				\classycv@PutComponent{/resume/left}%
 			};%
 			% Draw delimiting vertical line.
-			\draw[draw=\delimiterColor, line width=\delimiterWidth, opacity=0.25] (\dimexpr\classycv@@lII+\classycv@GEOMETRY@BLANK@MARGIN, \classycv@GEOMETRY@BLANK@MARGIN) -- (\dimexpr\classycv@@lII+\classycv@GEOMETRY@BLANK@MARGIN, \classycv@@lIII);%
+			\draw[draw=\delimiterColor, line width=\delimiterWidth] (\dimexpr\classycv@@lIII, 0) rectangle (\classycv@@lII, \paperheight);%
 		}%
 	]%
 	\bgroup\expandafter\color\expandafter{\rightFg}\rightStyle%
@@ -1762,7 +1762,7 @@
 		, border width=0pt%
 		, border color=accent-color%
 		, padding=0pt%
-	] {\circle[border width=2pt]\faUser~~\text}%
+	] {\circle[background color=white, text color=accent-color]\faUser~~\text}%
 	\hspace*{6pt}%
 	\begin{varwidth}{\linewidth-12pt}%
 		\begin{Table}[%
@@ -1821,7 +1821,7 @@
 		, border width=0pt%
 		, border color=accent-color%
 		, padding=0pt%
-	] {\circle[border width=2pt]\faComments~~\text}%
+	] {\circle[background color=white, text color=accent-color]\faComments~~\text}%
 	\hspace*{6pt}%
 	\begin{varwidth}{\linewidth-12pt}%
 		\begin{Table}[%
@@ -1922,16 +1922,16 @@
 	/classycv/data/draw circle/options/.cd%
 	, height/.initial=\dimexpr1.5\baselineskip\relax%
 	, height/.default=\dimexpr1.5\baselineskip\relax%
-	, border width/.initial=1pt%
-	, border width/.default=1pt%
-	, border color/.default=%
-	, border color/.initial=%
+	, border width/.initial=0pt%
+	, border width/.default=0pt%
+	, border color/.default=none%
+	, border color/.initial=none%
 	, padding/.initial=\dimexpr0.25\ht\strutbox\relax%
 	, padding/.default=\dimexpr0.25\ht\strutbox\relax%
-	, background color/.initial=%
-	, background color/.default=%
-	, text color/.initial=%
-	, text color/.default=%
+	, background color/.initial=accent-color%
+	, background color/.default=accent-color%
+	, text color/.initial=white%
+	, text color/.default=white%
 }
 
 \pgfkeys{%
@@ -2471,28 +2471,28 @@
 	, left foreground color/.default=highlight-color%
 	, left background color/.initial=white%
 	, left background color/.default=white%
-	, left address style/.initial={\flafamily\fontseries{l}\selectfont\larger}%
-	, left address style/.default={\flafamily\fontseries{l}\selectfont\larger}%
-	, left header style/.initial={\flafamily\bfseries\larger[2]}%
-	, left header style/.default={\flafamily\bfseries\larger[2]}%
-	, left header color/.initial=accent-color%
-	, left header color/.default=accent-color%
-	, left header label color/.initial=accent-color%
-	, left header label color/.default=accent-color%
-	, left header skip before/.initial={\bigskip}%
-	, left header skip before/.default={\bigskip}%
-	, left entry style/.initial={\robotofamily\fontseries{l}\selectfont\small}%
-	, left entry style/.default={\robotofamily\fontseries{l}\selectfont\small}%
-	, left entry skip above/.initial={}%
-	, left entry skip above/.default={}%
-	, left entry skip below/.initial={\smallskip}%
-	, left entry skip below/.default={\smallskip}%
-	, right basic style/.initial={\robotofamily\fontseries{l}\selectfont\normalsize}%
-	, right basic style/.default={\robotofamily\fontseries{l}\selectfont\normalsize}%	
 	, left title style/.initial={\larger[3]\bfseries}
 	, left title style/.default={\larger[3]\bfseries}
 	, left title name style/.initial={\larger[2]\fontseries{l}\selectfont}
 	, left title name style/.default={\larger[2]\fontseries{l}\selectfont}
+	%!, left address style/.initial={\flafamily\fontseries{l}\selectfont\larger}%
+	%!, left address style/.default={\flafamily\fontseries{l}\selectfont\larger}%
+	, left header style/.initial={\flafamily\bfseries\larger[2]}%
+	, left header style/.default={\flafamily\bfseries\larger[2]}%
+	, left header color/.initial=accent-color%
+	, left header color/.default=accent-color%
+	%!, left header label color/.initial=accent-color%
+	%!, left header label color/.default=accent-color%
+	%!, left header skip before/.initial={\bigskip}%
+	%!, left header skip before/.default={\bigskip}%
+	, left entry style/.initial={\robotofamily\fontseries{l}\selectfont\small}%
+	, left entry style/.default={\robotofamily\fontseries{l}\selectfont\small}%
+	%!, left entry skip above/.initial={}%
+	%!, left entry skip above/.default={}%
+	%!, left entry skip below/.initial={\smallskip}%
+	%!, left entry skip below/.default={\smallskip}%
+	, right basic style/.initial={\robotofamily\fontseries{l}\selectfont\normalsize}%
+	, right basic style/.default={\robotofamily\fontseries{l}\selectfont\normalsize}%	
 	, right foreground color/.initial=black%
 	, right foreground color/.default=black%
 	, delimiter color/.initial=highlight-color%
