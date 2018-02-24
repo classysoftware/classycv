@@ -493,7 +493,7 @@
 		\draw[use as bounding box, draw=none, inner sep=0pt] rectangle (\width, \height);%
 		\path[draw, line width=\strength, color=#2] (current bounding box.west) -- (current bounding box.east);%
 	}%
-	\ifdim\skipBelow=0pt\else\vspace*{\skipBelow}\par\fi%
+	\ifdim\skipBelow=0pt\par\else\vspace*{\skipBelow}\par\fi%
 	\egroup%
 }
 
@@ -764,7 +764,7 @@
 	\expandafter\tabular\expandafter{\columnFormat}%
 }{%
 	\endtabular%
-	\ifdim\skipBelow=0pt\else\vspace*{\skipBelow}\par\fi%
+	\ifdim\skipBelow=0pt\par\else\vspace*{\skipBelow}\par\fi%
 	\egroup%
 }
 
@@ -792,7 +792,7 @@
 		\setlength{\parsep}{0pt}%
 }{%
 	\end{itemize}%
-	\ifdim\skipBelow=0pt\else\vspace*{\skipBelow}\par\fi%
+	\ifdim\skipBelow=0pt\par\else\vspace*{\skipBelow}\par\fi%
 	\egroup%
 }
 
@@ -828,7 +828,7 @@
 	{\topicLineStyle{#3}\par}%
 	\vspace*{\skipBetween}%
 }{%
-	\ifdim\skipBelow=0pt\\\else\vspace*{\skipBelow}\par\fi%
+	\ifdim\skipBelow=0pt\par\else\vspace*{\skipBelow}\par\fi%
 	\egroup%
 }
 
