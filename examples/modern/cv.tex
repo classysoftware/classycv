@@ -68,6 +68,15 @@
 \classycvSet{/settings/cover letter/format}{us-block}
 \classycvSet{/settings/resume/format}{modern}
 
+% Set heading options
+\classycvSet{/put heading/options/padding}{0pt}
+\classycvSet{/put heading/options/skip above}{\baselineskip}
+\classycvSet{/put heading/options/skip below}{\baselineskip}
+
+% Set resume entry options.
+\classycvSet{/put resume entry/options/skip above}{0pt}
+\classycvSet{/put resume entry/options/skip below}{\baselineskip}
+
 \begin{CoverLetter}{%
     name=John Smith%
     , organisation=%
@@ -97,26 +106,27 @@
     , personal data heading text={\MakeUppercase{about me}}%
     , contact data heading text={\MakeUppercase{contact me}}%
 }%
-    \heading[padding=0pt, skip above=2\baselineskip, skip below=\baselineskip]{\circle[border width=2pt]{\faSuitcase}~~Professional Experience}%
-    \begin{Entry}[skip above=0pt]{\textit{\MakeUppercase{IT Group}}\\Melbourne, AU}{Lead Web Developer~(June 2012 --- Current)}%
+    % Remove skip above for the first heading.
+    \heading[skip above=0pt]{\circle[border width=2pt]{\faSuitcase}~~Professional Experience}%
+    \begin{Entry}{Lead Web Developer\hfill June 2012 --- Current}{\textit{\MakeUppercase{IT Group}}~(Melbourne, AU)}%
         Hello, here is some text without a meaning. This text should show what a printed text will look like at this place.%
     \end{Entry}%
-    \begin{Entry}[skip above=0pt]{\textit{\MakeUppercase{IT Group}}\\Melbourne, AU}{Lead Web Developer~(June 2012 --- Current)}%
+    \begin{Entry}{Lead Web Developer\hfill June 2012 --- Current}{\textit{\MakeUppercase{IT Group}}~(Melbourne, AU)}%
         If you read this text, you will get no information. Really? Is there no information? Is there a difference between this text and some nonsense like “Huardest gefburn”?%
     \end{Entry}%
     %
-    \heading[padding=0pt, skip above=1\baselineskip, skip below=\baselineskip]{\circle[border width=2pt]{\faGraduationCap}~~Education}%
-    \begin{Entry}[skip above=0pt]{\textit{\MakeUppercase{University of California}} (2004 --- 2006)}{Master in Digital Arts}%
+    \heading{\circle[border width=2pt]{\faGraduationCap}~~Education}%
+    \begin{Entry}{Master in Digital Arts\hfill2004 --- 2006}{\textit{\MakeUppercase{University of California}}}%
         Kjift – not at all! A blind text like this gives you information about the selected font, how the letters are written and an impression of the look.%
     \end{Entry}%
-    \begin{Entry}[skip above=0pt]{\textit{\MakeUppercase{Amsterdam University of Art}} (2001 --- 2004)}{Bachelor in Graphic Design}%
+    \begin{Entry}{Bachelor in Graphic Design\hfill2001 --- 2004}{\textit{\MakeUppercase{Amsterdam University of Art}}}%
         This text should contain all letters of the alphabet and it should be written in of the original language.%
     \end{Entry}%
-    \begin{Entry}[skip above=0pt]{\textit{\MakeUppercase{London College of Art}} (1999 --- 2001)}{Secondary School}%
+    \begin{Entry}{Secondary School\hfill1999 --- 2001}{\textit{\MakeUppercase{London College of Art}}}%
         There is no need for special content, but the length of words should match the language.%
     \end{Entry}%
     %
-    \heading[padding=0pt, skip above=\baselineskip, skip below=\baselineskip]{\circle[border width=2pt]{\faTrophy}~~Awards~\&~Achievements}%
+    \heading{\circle[border width=2pt]{\faTrophy}~~Awards~\&~Achievements}%
     \begin{List}[skip above=0pt, skip below=0pt]
         \item Interview for \textit{Smashingmagazine}, April 2007%
         \item Webmaster award at \textit{Master Me}, September 2003%

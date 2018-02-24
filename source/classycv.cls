@@ -821,13 +821,17 @@
 		, skip above/.get=\skipAbove%
 		, skip between/.get=\skipBetween%
 		, skip below/.get=\skipBelow%
+		, skip left/.get=\skipLeft%
+		, skip right/.get=\skipRight%
 	}%
-	\ifdim\skipAbove=0pt\else\vspace*{\skipAbove}\par\fi%
-	\basicStyle%
-	{\dateLineStyle{#2}\par}%
-	{\topicLineStyle{#3}\par}%
-	\vspace*{\skipBetween}%
+	\ifdim\skipAbove=0pt\else\vspace*{\skipBelow}\par\fi%
+	\begin{adjustbox}{minipage={\dimexpr\linewidth-\dimexpr\skipLeft+\skipRight\relax}, margin=\skipLeft 0pt \skipRight 0pt}%
+		{\dateLineStyle{#2}\par}%
+		{\topicLineStyle{#3}\par}%
+		\vspace*{\skipBetween}%
+		\basicStyle%
 }{%
+	\end{adjustbox}%
 	\ifdim\skipBelow=0pt\par\else\vspace*{\skipBelow}\par\fi%
 	\egroup%
 }
@@ -1625,10 +1629,13 @@
 	% Draw left and right content boxes using tcolorbox.
 	\begin{tcolorbox}[%
 		blanker%
-		% Shift the right box part to the right by the width of the left side plus left page margin.
-		, leftupper=\dimexpr\classycv@@lII+\dimexpr\classycv@GEOMETRY@BLANK@MARGIN\relax%
-		% Add slight padding.
-%		, boxsep=2em%
+		, boxsep=2em%
+		, top=0pt%
+		, right=0pt%
+		, bottom=0pt%
+		, left=0pt%
+		% Shift the content box to the right by the width of the left side plus left page margin.
+		, leftupper=\classycv@@lII%
         , width=\textwidth%
         , height fixed for=all%
         , height fill=true%
@@ -1654,9 +1661,7 @@
 	]%
 	\bgroup\expandafter\color\expandafter{\rightFg}\rightStyle%
 	\begin{center}%
-		\begin{varwidth}{\dimexpr\classycv@@lI-1in\relax}%
 }{%
-		\end{varwidth}%
 	\end{center}%
 	\egroup%
 	\vfill%
@@ -2106,6 +2111,10 @@
 	, skip between/.default=0.5\baselineskip%
 	, skip below/.initial=\baselineskip%
 	, skip below/.default=\baselineskip%	
+	, skip left/.initial=1em%
+	, skip left/.default=1em%	
+	, skip right/.initial=1em%
+	, skip right/.default=1em%	
 }
 
 \pgfkeys{%

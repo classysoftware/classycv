@@ -20,6 +20,15 @@
 % Choose classic resume format.
 \classycvSet{/settings/resume/format}{classic}
 
+% Set heading options.
+\classycvSet{/put heading/options/skip above}{\baselineskip}
+\classycvSet{/put heading/options/skip below}{0pt}
+\classycvSet{/put heading/options/padding}{0pt}
+
+% Set resume entry options.
+\classycvSet{/put resume entry/options/skip above}{\baselineskip}
+\classycvSet{/put resume entry/options/skip below}{0pt}
+
 %
 % document
 %
@@ -57,7 +66,7 @@
 %%
 % experience
 %%
-\heading[padding=0pt, skip above=\baselineskip, skip below=\baselineskip]{\circle[border width=0pt, border color=accent-color, background color=accent-color, text color=white]{\faWrench}~~Arbeitserfahrung}%
+\heading{\circle[border width=0pt, border color=accent-color, background color=accent-color, text color=white]{\faWrench}~~Arbeitserfahrung}%
 %
 \begin{Entry}{%
     \color{accent-color}\fontseries{l}\selectfont01/06/2007–Heute%
@@ -97,8 +106,9 @@
 %%
 % education
 %%
+% We need a manual page break here for unknown reasons.
 \newpage
-\heading[padding=0pt, skip above=\baselineskip, skip below=\baselineskip]{\circle[border width=0pt, border color=accent-color, background color=accent-color, text color=white]{\faGraduationCap}~~Ausbildung}%
+\heading{\circle[border width=0pt, border color=accent-color, background color=accent-color, text color=white]{\faGraduationCap}~~Ausbildung}%
 %
 \begin{Entry}{09/1996 --- 08/2005}{%
     \textbf{Abitur}\hfill EQF Niveau 3\\\textit{Robert-Muster-Gymnasium}, Marburg%
@@ -112,7 +122,7 @@
     \end{List}
 \end{Entry}
 % 
-\heading[padding=0pt, skip above=0pt, skip below=\baselineskip]{\circle[border width=0pt, border color=accent-color, background color=accent-color, text color=white]{\faUser}~~Persönliche Fähigkeiten}%
+\heading{\circle[border width=0pt, border color=accent-color, background color=accent-color, text color=white]{\faUser}~~Persönliche Fähigkeiten}%
 %
 \begin{Entry}{Sprachkenntnisse}{}%
     \textbf{Muttersprache}: Deutsch%
@@ -136,6 +146,7 @@
     {\footnotesize A1/2: elementare Sprachverwendung - B1/2: selbstständige Sprachverwendung - C1/2: kompetente Sprachverwendung}; {\footnotesize GT: An Gesprächen teilnehmen; ZS: zusammenhängendes Sprechen}; {\footnotesize\href{http://europass.cedefop.europa.eu/de/resources/european-language-levels-cefr}{\ul{Gemeinsamer Europ\"aischer Referenzrahmen f\"ur Sprachen}}}
 \end{Entry}
 %
+\newpage%
 \begin{Entry}{Kommunikative Fähigkeiten}{}%
     \begin{List}[skip above=0pt]%
         \item Teamgeist 
@@ -173,7 +184,8 @@ Reisestellen der beiden Unternehmen sehr geschätzt wurde.
     B%
 \end{Entry}
 %
-\heading[border width=1pt, padding=0pt, skip above=\baselineskip, skip below=\baselineskip]{\circle[border width=0pt, border color=accent-color, background color=accent-color, text color=white]{\faInfo}~~Zusätzliche Informationen}%
+\newpage%
+\heading{\circle[border width=0pt, border color=accent-color, background color=accent-color, text color=white]{\faInfo}~~Zusätzliche Informationen}%
 %
 \begin{Entry}{Mitgliedschaften}{}%
     \begin{List}[skip above=0pt]%
@@ -188,6 +200,6 @@ Reisestellen der beiden Unternehmen sehr geschätzt wurde.
 \end{Resume}
 %%
 % Attachment
-%% 
+%%
 \attachment[name=Anhänge][][height=0.9\textheight]{attachment}
 \end{document}
