@@ -1,0 +1,324 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesClass{classycvresumethemeharvard}[2018/11/01 Harvard style resume]
+
+\RequirePackage{pgfkeys}
+\RequirePackage{tikz}
+\RequirePackage{letltxmacro}
+\RequirePackage[pass, margin=0pt]{geometry}
+\RequirePackage[pagestyles,explicit,compact]{titlesec}
+\RequirePackage{tabularx}
+\RequirePackage{relsize}
+\RequirePackage{adjustbox}
+\RequirePackage{storebox}
+
+
+%
+% Settings
+%
+\usetikzlibrary{positioning}
+\classycvuselibrary{colors}
+\classycvuselibrary{fonts}
+\classycvuselibrary{icons}
+
+\makeatletter
+
+% Set page margins (see, https://resumegenius.com/how-to-write-a-resume/resume-fonts-margins-paper-guidelines)
+\newgeometry{%
+	includeheadfoot%
+	, nomarginpar%
+	, headheight=\dimexpr\baselineskip + 0.5in%
+	, headsep=\baselineskip%
+	% Add up footer skip and footer height to properly space bottom of footer from bottom of content box.
+	, footskip=\dimexpr\baselineskip + 0.5in\relax%
+	, tmargin=0.5in%
+	, rmargin=0.5in%
+	, bmargin=0.5in%
+	, lmargin=0.5in%
+}
+\savegeometry{resume}
+
+\newpagestyle{resume}{%
+  \setheadrule{0pt}%
+  \setfootrule{0pt}%
+  \sethead{%
+    \@classycv@resume@header%
+  }{}{}%
+  \setfoot{%
+    \@classycv@resume@footer%
+  }{}{}%
+   \setlength{\parskip}{0pt}%
+  \setlength{\parindent}{0pt}%
+}
+
+%
+% Components
+%
+
+\declarestylesheet[%
+  skip above=\the\dimexpr4\baselineskip\relax%
+  , skip below=\the\baselineskip%
+  , font size=LARGE%
+  , font family=fla%
+  , font shape=sc%
+  , font series=b%
+  , text align=center%
+  , text color=accent-color%
+]{/resume/section}
+
+%%
+% Customiable section
+%%
+\renewcommand{\section}[1]{%
+  \bgroup%
+  \pgfkeys{%
+    /classycv/library/stylesheets/resume/section/.cd%
+    , skip left/.get=\@@skipleft%
+    , skip below/.get=\@@skipbelow%
+    , skip right/.get=\@@skipright%
+    , skip above/.get=\@@skipabove%
+    , font family/.get=\@@fontfamily%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+    , font size/.get=\@@fontsize%
+    , text color/.get=\@@textcolor%
+    , text align/.get=\@@textalign%
+  }%
+  \vspace*{\@@skipabove}%
+  \parbox{\textwidth}{%
+    \ifnum\pdf@strcmp{\@@textalign}{center}=\z@\centering%
+    \else%
+      \ifnum\pdf@strcmp{\@@textalign}{right}=\z@\hfill\fi%
+    \fi%
+    \applystyle{font family}{\@@fontfamily}%
+    \applystyle{font series}{\@@fontseries}%
+    \applystyle{font shape}{\@@fontshape}%
+    \applystyle{font size}{\@@fontsize}%
+    \applystyle{text color}{\@@textcolor}%
+    {#1}%
+  }%
+  \vspace*{\@@skipbelow}%
+  \egroup%
+  \ignorespaces%
+}
+
+%%
+% Resume environment
+%%
+\renewenvironment{resume}{%
+  \loadgeometry{resume}%
+  \pagestyle{resume}%
+  \clearpage%
+  \LetLtxMacro\entry\@classycv@resume@entry%
+  \LetLtxMacro\entryline\@classycv@resume@entryline%
+  \LetLtxMacro\block{\@classycv@resume@block}%
+  \LetLtxMacro\endblock{\end@classycv@resume@block}%
+  \setlength{\parskip}{0pt}%
+  \setlength{\parindent}{0pt}%
+}{%
+  \restoregeometry%
+  \clearpage%
+}
+
+\declarestylesheet[%
+  text color=highlight-color%
+  , font family=fve%
+]{/resume/header}
+
+\newcommand{\@classycv@resume@header}{%
+  \pgfkeys{%
+    /classycv/submitter/.cd%
+    , name/.get=\name%
+    , street/.get=\street%
+    , house/.get=\house%
+    , zipcode/.get=\zipcode%
+    , city/.get=\city%
+  }%
+  \pgfkeys{%
+    /classycv/library/stylesheets/resume/header/.cd%
+    , text color/.get=\@@textcolor%
+    , font family/.get=\@@fontfamily%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+    , font size/.get=\@@fontsize%
+  }%
+  \setlength{\parskip}{\baselineskip}%
+  \setlength{\parindent}{0pt}%
+  \tikz{%
+    \draw[draw=none, use as bounding box] (0, 0) rectangle (\textwidth, 0.5in);%
+    \draw[color=light-gray, line width=1pt] (0, 1pt) -- (\textwidth, 1pt);
+    \node[inner sep=0pt, outer sep=0pt, text width=\textwidth, text=\@@textcolor, font=\fontfamily{\@@fontfamily}\fontseries{\@@fontseries}\fontshape{\@@fontshape}\selectfont] at (current bounding box.center) {%
+      \begin{tabularx}{\textwidth}{@{}X >{\centering\arraybackslash}X >{\raggedleft\arraybackslash}X@{}}%
+        \name%
+        & {\larger[2]Curriculum Vitae}%
+        & \thepage%
+      \end{tabularx}%
+    };% 
+  }
+}
+
+\declarestylesheet[%
+  text color=highlight-color%
+  , font family=fve%
+  , border color=light-gray%
+  , border width=1pt%
+]{/resume/footer}
+
+\newcommand{\@classycv@resume@footer}{%
+  \pgfkeys{%
+    /classycv/submitter/.cd%
+    , street/.get=\street%
+    , house/.get=\house%
+    , city/.get=\city%
+    , zipcode/.get=\zipcode%
+    , phone/.get=\phone%
+    , email/.get=\email%
+    , website/.get=\website%
+    , addition/.get=\additional%
+  }%
+  \pgfkeys{%
+  /classycv/library/stylesheets/resume/footer/.cd%
+  , text color/.get=\@@textcolor%
+  , font family/.get=\@@fontfamily%
+  , font series/.get=\@@fontseries%
+  , font shape/.get=\@@fontshape%
+  , font size/.get=\@@fontsize%
+  , border color/.get=\@@bordercolor
+  , border width/.get=\@@borderwidth
+}%
+  \tikz{%
+    \draw[draw=none, use as bounding box] (0, 0) rectangle (\textwidth, 0.5in);
+    \draw[color=\@@bordercolor, line width=\@@borderwidth] (0, \dimexpr0.5in - 1pt) -- (\textwidth, \dimexpr0.5in - 1pt);
+    \node[below=\baselineskip of current bounding box.north, inner sep=0pt, outer sep=0pt, text width=\textwidth, text=\@@textcolor, font=\fontfamily{\@@fontfamily}\fontseries{\@@fontseries}\fontshape{\@@fontshape}\selectfont] {%
+      \begin{tabularx}{\textwidth}{@{}l >{\centering\arraybackslash}X r@{}}%
+        \faMobilePhone~~\phone & \faAt~~\email & \ComputerMouse~~\website
+      \end{tabularx}%
+    };%
+  }%
+}
+
+\declarestylesheet[%
+  text color=foreground-color%
+  , font family=fve%
+  , skip above=0pt%
+  , skip below=\the\baselineskip%
+  , skip right=0ex%
+  , skip above=0pt,% 
+  , skip left=\the\itemindent%
+  , parindent=0pt%
+  , parskip=\the\baselineskip% 
+]{/resume/block}
+
+\renewenvironment{@classycv@resume@block}{%
+  \pgfkeys{%
+    /classycv/library/stylesheets/resume/block/.cd%
+    , skip above/.get=\@@skipabove%
+    , skip right/.get=\@@skipright%
+    , skip below/.get=\@@skipbelow%
+    , skip left/.get=\@@skipleft%
+    , padding left/.get=\@@paddingleft%
+    , padding bottom/.get=\@@paddingbottom%
+    , padding right/.get=\@@paddingright%
+    , padding top/.get=\@@paddingtop%
+    , parskip/.get=\@@parskip%
+    , parskip/.get=\@@parindent%
+    , text color/.get=\@@textcolor%
+    , font family/.get=\@@fontfamily%
+    , font size/.get=\@@fontsize%
+  }%
+  \begin{adjustbox}{minipage=[t][][l]{\textwidth-\dimexpr\@@skipleft+\@@skipright+\@@paddingleft+\@@paddingright\relax}, margin={\@@skipleft} {\@@skipbelow} {\@@skipright} {\@@skipabove}, padding={\@@paddingleft} {\@@paddingbottom} {\@@paddingright} {\@@paddingtop}}%
+      \applystyle{parskip}{\@@parskip}%
+      \applystyle{parindent}{\@@parindent}%
+      \applystyle{font family}{\@@fontfamily}%
+      \applystyle{font series}{\@@fontseries}%
+      \applystyle{font shape}{\@@fontshape}%
+      \applystyle{font size}{\@@fontsize}%
+      \applystyle{text color}{\@@textcolor}%
+  }{%
+    \end{adjustbox}%
+}
+
+\declarestylesheet[%
+  parskip=0pt%
+  , parindent=0pt%
+  , skip above=\the\baselineskip%
+  , skip below=0pt%
+  , font family=Roboto-LF%
+  , font series=l%
+  , skip below=2ex%
+]{/resume/entry}
+
+\renewcommand{\@classycv@resume@entry}[4]{%
+  \pgfkeys{%
+    /classycv/library/stylesheets/resume/entry/.cd%
+    , skip above/.get=\@@skipabove%
+    , skip right/.get=\@@skipright%
+    , skip below/.get=\@@skipbelow%
+    , skip left/.get=\@@skipleft%
+    , padding left/.get=\@@paddingleft%
+    , padding bottom/.get=\@@paddingbottom%
+    , padding right/.get=\@@paddingright%
+    , padding top/.get=\@@paddingtop%
+    , parskip/.get=\@@parskip%
+    , parskip/.get=\@@parindent%
+    , text color/.get=\@@textcolor%
+    , font family/.get=\@@fontfamily%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+    , font size/.get=\@@fontsize%
+  }%
+  \par%
+  \adjustbox{minipage=[t][][l]{\textwidth-\dimexpr\@@skipleft+\@@skipright+\@@paddingleft+\@@paddingright\relax}, margin={\@@skipleft} {\@@skipbelow} {\@@skipright} {\@@skipabove}, padding={\@@paddingleft} {\@@paddingbottom} {\@@paddingright} {\@@paddingtop}}{%
+    \applystyle{parskip}{\@@parskip}%
+    \applystyle{parindent}{\@@parindent}%
+    \applystyle{font family}{\@@fontfamily}%
+    \applystyle{font series}{\@@fontseries}%
+    \applystyle{font shape}{\@@fontshape}%
+    \applystyle{font size}{\@@fontsize}%
+    \applystyle{text color}{\@@textcolor}%
+    \textbf{#1}~\cdotfill~{#2}\par%
+    \textit{#3}\hfill{#4}%
+  }%
+  \ignorespaces%
+}
+
+\declarestylesheet[%
+  parskip=0pt%
+  , parindent=0pt%
+  , font family=Roboto-LF%
+  , font series=l%
+]{/resume/entryline}
+
+\renewcommand{\@classycv@resume@entryline}[2]{%
+  \pgfkeys{%
+    /classycv/library/stylesheets/resume/entryline/.cd%
+    , skip above/.get=\@@skipabove%
+    , skip right/.get=\@@skipright%
+    , skip below/.get=\@@skipbelow%
+    , skip left/.get=\@@skipleft%
+    , padding left/.get=\@@paddingleft%
+    , padding bottom/.get=\@@paddingbottom%
+    , padding right/.get=\@@paddingright%
+    , padding top/.get=\@@paddingtop%
+    , parskip/.get=\@@parskip%
+    , parskip/.get=\@@parindent%
+    , text color/.get=\@@textcolor%
+    , font family/.get=\@@fontfamily%
+    , font shape/.get=\@@fontshape%
+    , font series/.get=\@@fontseries%
+    , font size/.get=\@@fontsize%
+  }%
+  \par%
+  \adjustbox{minipage=[t][][l]{\textwidth-\dimexpr\@@skipleft+\@@skipright}, margin={\@@skipleft} {\@@skipbelow} {\@@skipright} {\@@skipabove}, padding={\@@paddingleft} {\@@paddingbottom} {\@@paddingright} {\@@paddingtop}}{%
+    \applystyle{parskip}{\@@parskip}%
+    \applystyle{parindent}{\@@parindent}%
+    \applystyle{font family}{\@@fontfamily}%
+    \applystyle{font series}{\@@fontseries}%
+    \applystyle{font shape}{\@@fontshape}%
+    \applystyle{font size}{\@@fontsize}%
+    \applystyle{text color}{\@@textcolor}%
+    \textbf{#1}~\cdotfill~{#2}%
+  }%
+  \ignorespaces%
+}
+
+\makeatother
