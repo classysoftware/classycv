@@ -1,0 +1,51 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesClass{classycvlibrarycolors}[2018/11/02 Color library for classycv]
+
+\RequirePackage{xcolor}
+\RequirePackage{pdftexcmds}
+
+\makeatletter
+
+\newif\if@classycv@library@colors@invert
+\pgfkeys{%
+  /classycv/library/colors/.cd%
+  , invert/.default=true%
+  , invert/.is if=@classycv@library@colors@invert%
+}
+
+\definecolor{nearly-black}{RGB}{24, 29, 38}
+\colorlet{nearly-white}{nearly-black!5}
+\colorlet{light-gray}{nearly-black!10}
+\colorlet{medium-gray}{nearly-black!50}
+\colorlet{dark-gray}{nearly-black!90}
+
+\definecolor{accent-cyan}{RGB}{80, 156, 180}
+\colorlet{highlight-cyan}{accent-cyan!50}
+
+\definecolor{accent-blue}{RGB}{48, 84, 128}
+\colorlet{highlight-blue}{accent-blue!75}
+
+\newcommand{\palette}[2][]{%
+  \pgfkeys{
+    /classycv/library/colors/.cd%
+    , invert=false%
+    , #1%
+  }%
+  \colorlet{accent-color}{accent-#2}%
+  \colorlet{highlight-color}{highlight-#2}%
+  \if@classycv@library@colors@invert%
+    \colorlet{background-color}{nearly-black}%
+    \colorlet{foreground-color}{white}%
+  \else%
+    \colorlet{foreground-color}{nearly-black}%
+    \colorlet{background-color}{white}%
+  \fi%
+}
+
+\newcommand{\alert}[1]{%
+  {\color{highlight-color}#1}%
+}
+
+\palette{blue}
+
+\makeatother
