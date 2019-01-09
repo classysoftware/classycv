@@ -1,0 +1,191 @@
+\documentclass[a4paper, 12pt]{classycv}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[pangram]{blindtext}
+
+\classycvusetheme{modern}
+\classycvuselibrary{attachments}
+\classycvuselibrary{drawings}
+\classycvuselibrary{icons}
+
+\palette{blue}%
+
+\submitter{%
+    , name=John Smith%,
+    , street=Rightward Way%
+    , house=134 %
+    , city=Portland%
+    , zipcode=04019%
+    , country=United States%
+    , countrycode=USA%
+    , phone=774-987-4009%
+    , email=j.smith@uptwowork.com%
+    , website=linkedin.com/johnutw%
+}
+
+\recipient{%
+    name=Carol Corporate%
+    , position=Head of human resources%
+    , company=Evil Corp.%
+    , street=Copernoll Hollow Dr.%
+    , house=1%
+    , city=Bosstown%
+    , zipcode=WI 53581%
+    , country=USA%
+}
+
+\begin{document}
+
+%
+% Cover letter
+%
+
+\begin{coverletter}
+    \printSubmitter%
+    \printDate{\today}%
+    \printRecipient%
+    \printSalutation{Dear Ms. Corporate:}%
+    \Blindtext[2][10]
+    \Blindtext[3][8]
+    \printClosing{Best regards,}
+    \printAttachments{Attachments: A, B}
+\end{coverletter}
+
+%
+% Resume
+%
+\palette{blue}
+
+\setstylesheet{/resume/leftpart}{font size=normalsize}%
+\setstylesheet{/resume/section}{skip left=2ex, skip right=2ex}%
+\setstylesheet{/resume/block}{padding left=4ex, padding right=4ex}%
+\setstylesheet{/drawings/progress}{background color=dark-gray, text color=highlight-color, height=\the\dimexpr0.5\baselineskip}%
+
+\begin{resume}
+    \begin{leftpart}
+        % Personal information
+        \section{\faUser~~\MakeUppercase{About Me}}%
+
+        \renewcommand{\arraystretch}{1.2}%
+        \begin{tabularx}{\linewidth-2ex-\tabcolsep}{@{\hspace*{2ex}}cX@{\hspace*{2ex}}}
+            \large\faMapMarker & \parbox{\linewidth}{
+                134 Rightward Way
+                \\Portland, ME, 04019
+            }
+            \\\large\faMobilePhone & 774-987-4009
+            \\\large\faAt & \href{mailto:j.smith@uptowork.com}{j.smith@uptowork\allowbreak .com}
+            \\\large\faLinkedin & \href{linkedin.com/johnutw}{linkedin.com/\allowbreak johnutw}
+        \end{tabularx}
+
+        % Skills
+        \section{\faWrench~~\MakeUppercase{Skills}}%
+        \begin{block}
+            Business Process Improvement
+            \\ Vendor Management
+            \\ Project Scheduling
+            \\ Sales Analysis
+            \\ Strategic Planning
+            \\ Communication Skills
+        \end{block}
+
+        % Software
+        \section{\faLaptop~~\MakeUppercase{Software}}%
+        \begin{block}
+            Microsoft Project
+            \\\progress{100}
+            
+            MS Windows Server
+            \\\progress{85}
+
+            Linux/Unix
+            \\\progress{85}
+
+            Microsoft Excel
+            \\\progress{60}
+        \end{block}
+
+        % Languages
+        \section{\faLanguage~~\MakeUppercase{Languages}}%
+        \begin{block}
+            French
+            \\\progress{60}
+            
+            German
+            \\\progress{20}
+        \end{block}
+    \end{leftpart}
+    
+    \begin{rightpart}
+        \setstylesheet{/resume/section}{text color=accent-color, font size=LARGE, skip above=1ex, skip left=4ex, skip right=4ex}%
+        \setstylesheet{/resume/title}{skip below=0ex, skip left=4ex, skip right=4ex}%
+        \title{
+            {\fontsize{42}{50}\selectfont\color{accent-color}John~~Smith}\par
+            \fontsize{24}{30}\selectfont\color{highlight-color}Resume
+        }
+
+        % Experience
+        \section{\faSuitcase~~\MakeUppercase{Experience}}
+        \begin{block}
+            \entry{Senior Project Manager}{2006/12-present}{Seton Hospital}{Austin, TX}
+            \begin{itemize}
+                \item \Blindtext[1][2]
+                \item \Blindtext[1][1]
+                \item \Blindtext[1][1]
+            \end{itemize}
+        \end{block}
+
+        \begin{block}
+            \entry{Junior Project Manager}{2004/09-2006/12}{Seton Hospital}{Austin, TX}
+            \begin{itemize}
+                \item\Blindtext[1][1]
+                \item\Blindtext[1][1]
+                \item\Blindtext[1][2]
+            \end{itemize}
+        \end{block}
+
+        \begin{block}
+            \entry{IT Support Officer}{2002/08-2004/09}{Seton Hospital}{Austin, TX}
+            \begin{itemize}
+                \item\Blindtext[1][1]
+                \item\Blindtext[1][1]
+            \end{itemize}
+        \end{block}
+
+        % Education
+        \section{\faGraduationCap~~\MakeUppercase{Education}}
+        \begin{block}
+            \entry{Master of Computer Science}{1999/09-2001/05}{University of Maryland}{College Park, MD}
+
+            \entry{Bachelor of Computer Science}{1996/09-1999/06}{University of Maryland}{College Park, MD}
+        \end{block}
+
+        % \setstylesheet{/resume/section}{skip above=12pt}%
+        \section{\faCertificate~~\MakeUppercase{Certifications}}
+        \begin{block}
+            \begin{itemize}
+                \item 2010/05~~PMP - Project Management Institute
+                \item 2007/11~~CAPM - Project Management Institute
+            \end{itemize}
+        \end{block}
+
+        \section{\faSoccerBallO~~\MakeUppercase{Interests}}
+        \begin{block}
+            \begin{itemize}
+                \item Avid cross country skier and cyclist
+                \item Member of the Parent Teacher Organisation
+            \end{itemize}
+        \end{block}
+    \end{rightpart}
+\end{resume}
+
+%
+% Attachments
+%
+% \pdfattachment[width=0.85\textwidth]{Attachment A}{../assets/attachment}
+\pdfattachment{Attachment A}{../assets/attachment}
+\blindattachment[B1]{Attachment B}
+\blindattachment[B2]{Attachment B}
+
+\end{document}
