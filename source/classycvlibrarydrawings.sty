@@ -1,0 +1,340 @@
+% TODO update pgfkeys pattern etc.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesClass{classycvlibrarydrawings}[2018/11/05 Drawings library for classycv]
+
+\RequirePackage{tikz}
+\RequirePackage{calc}
+
+\makeatletter
+
+\usetikzlibrary{calc, positioning, shapes, svg.path, shadows}
+\classycvuselibrary{colors}
+\classycvuselibrary{stylesheets}
+
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{overlay 1}
+\pgfdeclarelayer{overlay 2}
+\pgfsetlayers{background,main,overlay 1,overlay 2}
+
+\newlength{\@classycv@lengthi}
+\newlength{\@classycv@lengthii}
+\newlength{\@classycv@lengthiii}
+\newlength{\@classycv@lengthiv}
+\newcounter{@classycv@counteri}
+\newcounter{@classycv@counterii}
+
+% SEE https://tex.stackexchange.com/a/392742
+\newcommand{\cdotfill}{\leavevmode\cleaders\hb@xt@.44em{\hss$\cdot$\hss}\hfill\kern\z@}
+
+\declarestylesheet[%
+	% 0.25 of lineheight
+  , padding=\dimexpr0.25\ht\strutbox\relax%
+  , border width=0pt%
+  , border color=none%
+  , background color=highlight-color%
+	, text color=white%
+]
+{/drawings/circle}
+
+\renewcommand{\circle}[1]{%
+	\bgroup%
+  \pgfkeys{%
+    /classycv/library/stylesheets/drawings/circle/.cd%
+    , padding/.get=\@@padding%
+		, height/.get=\@@height%
+		, border width/.get=\@@borderwidth%
+		, border color/.get=\@@bordercolor%
+    , background color/.get=\@@backgroundcolor%
+    , font size/.get=\@@fontsize%
+    , font family/.get=\@@fontfamily%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+		, text color/.get=\@@textcolor%
+	}%
+	\applystyle{font family}{\@@fontfamily}%
+	\applystyle{font size}{\@@fontsize}%
+	\applystyle{font series}{\@@fontseries}%
+	\applystyle{font shape}{\@@fontshape}%
+	\applystyle{text color}{\@@textcolor}%
+	\setlength{\@classycv@lengthi}{\ht\strutbox+2\@@padding}%
+			\tikz[baseline=(text.base)]{
+				\node[
+					text width=\@classycv@lengthi
+					, align=center
+					, inner sep=\@@padding
+					, outer sep=\z@
+					, fill=\@@backgroundcolor
+					, draw=\@@bordercolor
+					, line width=\@@borderwidth
+					, circle
+				] (text) {#1};
+			}%
+	% }%
+	\egroup%
+}
+
+% TODO re-add
+% %%
+% % Draw a simple horizontal bar.
+% %
+% % #1: (optional) Command options.
+% % #2: (mandatory) Bar color.
+% %%
+% \providecommand{\bar}[2][]{%
+% 	\bgroup%
+% 	\pgfkeys{/classycv/data/put bar/options/.cd, #1}%
+% 	\pgfkeys{%
+% 		/classycv/data/put bar/options/.cd%
+% 		, width/.get=\width%
+% 		, height/.get=\height%
+% 		, strength/.get=\strength%
+% 		, skip above/.get=\skipAbove%
+% 		, skip below/.get=\skipBelow%
+% 	}%	
+% 	\ifdim\skipAbove=0pt\else\vspace*{\skipAbove}\par\fi%
+% 	\tikz{
+% 		\draw[use as bounding box, draw=none, inner sep=0pt] rectangle (\width, \height);%
+% 		\path[draw, line width=\strength, color=#2] (current bounding box.west) -- (current bounding box.east);%
+% 	}%
+% 	\ifdim\skipBelow=0pt\par\else\vspace*{\skipBelow}\par\fi%
+% 	\egroup%
+% }
+
+\declarestylesheet[%
+  height=\baselineskip%
+  , background color=accent-color!25%
+  , text color=accent-color%
+  , width=\linewidth%
+  , border width=0pt%
+  , border color=none
+]
+{/drawings/progress}
+
+%%
+% Draw a simple horizontal progress bar.
+%
+% #1: (optional) Command options.
+% #2: (mandatory) Completion percentage.
+%
+% TODO progress bar is not properly aligned if a non-zero border is specified.
+%%
+\providecommand{\progress}[2][]{%
+	\pgfkeys{%
+		/classycv/library/stylesheets/drawings/progress/.cd%
+		, width/.get=\@@width%
+		, height/.get=\@@height%
+		, background color/.get=\@@backgroundcolor%
+		, text color/.get=\@@textcolor%
+		, border width/.get=\@@borderwidth%
+		, border color/.get=\@@bordercolor%
+	}%
+	% Calculate the width and height of the progress bar foreground (the visible completion).
+	\setlength{\@classycv@lengthi}{\@@width}%
+	\divide\@classycv@lengthi by 100\relax%
+	\multiply\@classycv@lengthi by #2\relax%
+	\setlength{\@classycv@lengthii}{\dimexpr\@@height-\@@borderwidth\relax}
+	\begin{tikzpicture}%
+			\begin{pgfonlayer}{background}%
+				\draw[text width=, line width=\@@borderwidth, draw=\@@bordercolor, fill=\@@backgroundcolor] (0, 0) rectangle +(\@@width, \@@height);%
+			\end{pgfonlayer}%
+			\begin{pgfonlayer}{main}%
+				\draw[draw=none, fill=\@@textcolor] (\@@borderwidth, \@@borderwidth) rectangle +(\@classycv@lengthi, \@classycv@lengthii);%
+			\end{pgfonlayer}%
+		% \fi%
+	\end{tikzpicture}%
+}
+
+%%
+% Draw a semi circle.
+%
+% #1: (optional) Command options.
+% #2: (mandatory) Completion percentage x (x = 0,...,100).
+%
+% HREF: http://tex.stackexchange.com/a/15983
+%%
+\providecommand{\semicircle}[2][]{%
+	\bgroup%
+  \pgfkeys{%
+    /classycv/library/drawings/semicircle/.cd%
+    , has label=false%
+    , #1%
+  }%
+	\pgfkeys{%
+		/classycv/library/drawings/semicircle/.cd%
+		, size/.get=\size%
+		, strength/.get=\strength%
+		, line color/.get=\lineColor%
+		, fill color/.get=\fillColor%
+		, label text/.get=\labelText%
+		, label font/.get=\labelFont%
+		, label color/.get=\labelColor%
+		, draw complement/.get=\drawComplement%
+		, complement line color/.get=\complementLineColor%
+		, draw glow/.get=\drawGlow%
+	}%
+	\tikz{%	
+		\pgfmathsetmacro\arcLength{(#2/100)*360}%
+		\pgfmathsetmacro\endDegree{Mod(\arcLength, 360)}%
+		% Normalize to 360 degrees if `\arcLength` is any multiple of 360 greater than 0.
+		\ifnum0 = \endDegree\relax%
+			\ifnum0 < #2\relax%
+				\pgfmathsetmacro\endDegree{360}%
+			\fi%
+		\fi%
+		\setlength{\@classycv@lengthi}{\dimexpr0.5\size\relax}%
+		\begin{pgfonlayer}{main}
+		    \draw[use as bounding box, draw=\lineColor, fill=\fillColor, rotate=270, line width=\strength] (0, 0) arc (0:\endDegree:\size);%
+		\end{pgfonlayer}{main}
+		% Draw a glow effect?
+		\ifnum\pdf@strcmp{yes}{\drawGlow}=\z@%
+			\begin{pgfonlayer}{background}
+			    \draw[draw=none, fill=none, circular glow={fill=light-gray!50!nearly-white}, rotate=270] (0, 0) arc (0:360:\size);%
+			\end{pgfonlayer}%
+		\fi%
+		% Draw complement?
+		\ifnum\pdf@strcmp{yes}{\drawComplement}=\z@%
+			\begin{pgfonlayer}{overlay 1}
+				\draw[draw=\complementLineColor, fill=\fillColor, line width=\strength, rotate=270] (0, 0) arc (360:\endDegree:\size);			
+		    \end{pgfonlayer}%
+		\fi%
+		% Draw label?
+    \if@classycv@library@drawings@semicircle@haslabel%
+			\begin{pgfonlayer}{overlay 2}%
+          % \node[draw=red, text width=0.6\size, inner sep=0pt, outer sep=0pt, align=center] at (current bounding box.center) {\labelText};%
+          \coordinate (Label Anchor) at ([xshift=-\dimexpr0.5\dimexpr\size\relax, yshift=\dimexpr0.5\dimexpr\size\relax]current bounding box.center);
+          \node[draw=none, rectangle, text width=\size, inner sep=0pt, outer sep=0pt, align=center] at (Label Anchor) {\labelText};%
+			\end{pgfonlayer}
+		\fi%
+	}%
+	\egroup%
+}
+
+\newif\if@classycv@library@drawings@semicircle@haslabel
+
+\pgfkeys{%
+	/classycv/library/drawings/semicircle/.cd%
+	, size/.initial=2em%
+	, size/.default=2em%
+	, strength/.initial=2pt%
+	, strength/.default=2pt%
+	, line color/.initial=accent-color%
+	, line color/.default=accent-color%
+	, fill color/.initial=white!0%
+	, fill color/.default=white!0%
+  , has label/.default=false%
+  , has label/.is if=@classycv@library@drawings@semicircle@haslabel%
+	, label text/.initial=\@empty%
+	, label text/.default=\@empty%
+	, label font/.initial=\normalsize%
+	, label font/.default=\normalsize%
+	, label color/.initial=accent-color%
+	, label color/.default=accent-color%
+	, draw complement/.initial=yes%
+	, draw complement/.default=yes%
+	, complement line color/.initial=light-gray%
+	, complement line color/.default=light-gray%
+	, draw glow/.initial=no%
+	, draw glow/.default=no%
+}
+
+% TODO re-add
+% %%
+% % Draw a doughnut chart.
+% %
+% % #1: (optional) Command options.
+% % #2: (mandatory) Completion percentage (a CSV list of entries with syntax `<label>/<percentage>/color' containing the specification of the doughnut's sectors).
+% %
+% % HREF https://tex.stackexchange.com/a/66219
+% % EXAMPLE \doughnut[strength=12pt]{1/20/blue!50,2/20/blue!40,3/25/blue!30,4/35/blue!20}
+% %%
+% \providecommand{\doughnut}[2][]{%
+% 	\pgfkeys{/classycv/data/put doughnut chart/options/.cd, #1}%
+% 	\pgfkeys{%
+% 		/classycv/data/put doughnut chart/options/.cd%
+% 		, size/.get=\size%
+% 		, strength/.get=\strength%
+% 		, line color/.get=\lineColor%
+% 		, label size/.get=\labelSize%
+% 		, label shape/.get=\labelShape%
+% 		, label line color/.get=\labelLineColor%
+% 		, label fill color/.get=\labelFillColor%
+% 		, label text color/.get=\labelTextColor%
+% 		, basic style/.get=\basicStyle%
+% 	}%
+% 	\setcounter{@classycv@counteri}{0}% arc start
+% 	\setcounter{@classycv@counterii}{0}% arc end
+% 	\begin{tikzpicture}[%
+% 		extended line/.style={shorten >=-##1,shorten <=-##1}
+% 		, extended line/.default=1cm
+% 		, right extended line/.style={shorten >=-##1}
+% 		, right extended line/.default=1cm
+% 	]%
+% 		\draw[draw=none, use as bounding box, inner sep=0pt, outer sep=0pt] rectangle (\size, \size);
+% 		\foreach \x [count=\i] in {#2} {%
+% 			\StrCut{\x}{/}\label\r%
+% 			\StrCut{\r}{/}\percentage\lineColor%
+% 			\setcounter{@classycv@counteri}{0}%
+% 			\addtocounter{@classycv@counteri}{\the@classycv@counterii}%
+% 			\setcounter{@classycv@counterii}{\numexpr 360 *\percentage/100\relax}%
+% 			\setcounter{@classycv@counterii}{\numexpr\the@classycv@counteri + \the@classycv@counterii}%
+% 			\draw[\lineColor, line width=\strength] ([shift=(\the@classycv@counteri:\dimexpr0.5\dimexpr\size-\strength\relax)]\dimexpr0.5\size\relax,\dimexpr0.5\size\relax) arc (\theclassycv@@cI:\theclassycv@@cII:\dimexpr0.5\dimexpr\dimexpr\size-\strength\relax) coordinate[below, midway] (P\i); 
+% 			\node[below right=-0.5em and -0.5em of P\i, text width=\labelSize, align=center, inner sep=0pt, outer sep=0pt, \labelShape, draw=\labelLineColor, fill=\labelFillColor, text=\labelTextColor] {\basicStyle\label};
+% 	};%
+% 	\end{tikzpicture}%
+% }
+
+\declarestylesheet[%
+	background color=foreground-color%
+	, width=\linewidth%
+	, height=\the\dimexpr\ht\strutbox\relax%
+]{/library/drawings/hbar}
+
+\renewcommand{\hbar}{
+	\pgfkeys{%
+		/classycv/library/stylesheets/library/drawings/hbar/.cd%
+		, background color/.get=\@@backgroundcolor%
+		, width/.get=\@@width%
+		, height/.get=\@@height%
+	}%
+	\bgroup%
+	\tikz{
+		\draw[draw=none, fill=\@@backgroundcolor] rectangle (\@@width, \@@height);
+	}%
+	\egroup%
+	\ignorespaces%
+}
+
+\declarestylesheet[%
+  parskip=\dimexpr0.5\baselineskip%
+  , background color=highlight-color%
+]{/library/drawings/linewithbar}
+
+\pgfkeys{%
+  /classycv/library/drawings/linewithbar/.cd
+  , reverse/.initial=false
+  , reverse/.default=false
+}
+
+\newcommand{\linewithbar}[2][]{%
+  \bgroup%
+  \settowidth{\@classycv@lengthi}{#2\ }%
+  \setlength{\@classycv@lengthii}{\the\dimexpr\linewidth-\the\@classycv@lengthi}%
+  \settototalheight{\@classycv@lengthiii}{#2}%
+  \setlength{\@classycv@lengthi}{\the\dimexpr1.5\@classycv@lengthiii}
+  \setlength{\@classycv@lengthiv}{-\dimexpr0.5\dimexpr\@classycv@lengthi-\@classycv@lengthiii\relax}
+  \pgfkeys{/classycv/library/drawings/linewithbar/.cd, #1}%
+  \pgfkeys{%
+		/classycv/library/stylesheets/library/drawings/hbar/.cd
+    , height=\the\@classycv@lengthi
+    , width=\the\@classycv@lengthii
+    , background color=\pgfkeysvalueof{/classycv/library/stylesheets/library/drawings/linewithbar/background color}
+  }%
+  \ifnum\pdf@strcmp{\pgfkeysvalueof{/classycv/library/drawings/linewithbar/reverse}}{false}=\z@%
+    #2\raisebox{\@classycv@lengthiv}[\@classycv@lengthi]{\hbar}\newline%
+  \else%
+    \raisebox{\@classycv@lengthiv}[\@classycv@lengthi]{\hbar}#2\newline%
+  \fi%
+  \egroup%
+}
+
+\makeatother
