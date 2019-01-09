@@ -1,0 +1,450 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesClass{classycvresumethemetwocolumn}[2018/11/03 Two column resume theme]
+
+% Comment line below and uncomment line two below for layout debugging
+\RequirePackage[pass, margin=0pt]{geometry}
+\RequirePackage[pagestyles,explicit,compact]{titlesec}
+\RequirePackage{adjustbox}
+\RequirePackage{letltxmacro}
+\RequirePackage{fancyvrb}
+\RequirePackage{tikz}
+\RequirePackage{enumitem}
+\RequirePackage{setspace}
+
+\makeatletter
+
+%
+% Settings
+%
+
+\usetikzlibrary{positioning,backgrounds}
+\classycvuselibrary{colors}
+\classycvuselibrary{fonts}
+\classycvuselibrary{stylesheets}
+
+\setlist{parsep=0pt, topsep=0pt}
+
+\newgeometry{%
+	% Ignore header, footer, margin par
+	noheadfoot%
+	, nomarginpar%
+  , ignoreall%
+	, width=\paperwidth%
+	, height=\paperheight%
+	, tmargin=0pt%
+	, rmargin=0pt%
+	, bmargin=0pt%
+	, lmargin=0pt%
+}
+\savegeometry{resume}
+
+\newpagestyle{resume}{%
+	\setheadrule{0pt}%
+	\setfootrule{0pt}%
+	\sethead{}{}{}%
+  \setfoot{}{}{}%
+}
+
+\declarestylesheet[%
+  skip above=\the\dimexpr0.5\baselineskip\relax%
+  , skip below=\the\dimexpr0.2\baselineskip\relax%
+  , font series=l%
+  , font size=Large%
+]{/resume/section}
+
+%%
+% Customiable section
+%%
+\renewcommand{\section}[1]{%
+  \bgroup%
+  \pgfkeys{%
+    /classycv/library/stylesheets/resume/section/.cd%
+    , skip left/.get=\@@skipleft%
+    , skip below/.get=\@@skipbelow%
+    , skip right/.get=\@@skipright%
+    , skip above/.get=\@@skipabove%
+    , font family/.get=\@@fontfamily%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+    , font size/.get=\@@fontsize%
+    , text color/.get=\@@textcolor%
+    , text align/.get=\@@textalign%
+  }%
+  \vspace*{\@@skipabove}%
+  \vspace*{\@@skipabove}%
+  \parbox{\textwidth}{
+    \ifnum\pdf@strcmp{\@@textalign}{center}=\z@\centering%
+    \else%
+      \ifnum\pdf@strcmp{\@@textalign}{right}=\z@\hfill\fi%
+    \fi%
+    \applystyle{font family}{\@@fontfamily}%
+    \applystyle{font series}{\@@fontseries}%
+    \applystyle{font shape}{\@@fontshape}%
+    \applystyle{font size}{\@@fontsize}%
+    \applystyle{text color}{\@@textcolor}%
+    {#1}%
+  }%
+  \vspace*{\@@skipbelow}\par%
+  \egroup%
+  \ignorespaces%
+}
+
+%
+% Commands
+%
+
+% TODO refactor
+\newenvironment{@classycv@exporttofile}[1]{%
+  \typeout{Exporting to file '#1'}%
+  \VerbatimOut{#1}%
+}{%
+  \endVerbatimOut%
+}
+
+%
+% Components
+%
+
+%%
+% Resume environment
+%%
+\renewenvironment{resume}[1][]{%
+  \loadgeometry{resume}%
+  \pagestyle{resume}%
+  \setlength{\parskip}{0pt}%
+  \setlength{\parindent}{0pt}%
+  \noindent%
+  \clearpage%
+  \LetLtxMacro\leftpart\@classycv@resume@collectleftpart%
+  \LetLtxMacro\endleftpart\end@classycv@resume@collectleftpart%
+  \LetLtxMacro\rightpart\@classycv@resume@collectrightpart%
+  \LetLtxMacro\endrightpart\end@classycv@resume@collectrightpart%
+  \LetLtxMacro\block\@classycv@resume@block%
+  \LetLtxMacro\endblock\end@classycv@resume@block%
+  \LetLtxMacro\entry\@classycv@resume@entry%
+  \LetLtxMacro\entryline\@classycv@resume@entryline%
+  \LetLtxMacro\title\@classycv@resume@title%
+  \LetLtxMacro\portrait\@classycv@resume@portrait%
+}{%
+  \begin{tikzpicture}
+    \draw[draw=none, use as bounding box] (0, 0) rectangle (\paperwidth, \paperheight);
+    \node[draw=none, below right=0pt and 0pt of current bounding box.north west, outer sep=0pt, inner sep=0pt, text width=0.3\paperwidth, text depth=0pt] {%
+      \@classycv@resume@leftpart%
+    };
+    \coordinate (Delimiter X) at ([shift={(0.3\paperwidth, 0pt)}]current bounding box.north west);
+    \node[draw=none, below right=0pt and 0pt of Delimiter X, outer sep=0pt, inner sep=0pt, text width=0.7\paperwidth, text depth=0pt] {%
+      \@classycv@resume@rightpart%
+    };
+  \end{tikzpicture} 
+  \restoregeometry%
+  \clearpage%
+  \newpage%
+}
+
+\newenvironment{@classycv@resume@collectleftpart}{%
+  \@classycv@exporttofile{classycv--resume-leftpart.tex}%
+}{%
+  \end@classycv@exporttofile%
+}
+
+
+\newenvironment{@classycv@resume@collectrightpart}{%
+  \@classycv@exporttofile{classycv--resume-rightpart.tex}%
+}{%
+  \end@classycv@exporttofile%
+}
+
+\declarestylesheet[%
+  parskip=\the\baselineskip%
+  , parindent=0pt%
+  , background color=foreground-color%
+  , text color=background-color%
+  , font size=small%
+]{/resume/leftpart}
+
+\newcommand{\@classycv@resume@leftpart}{%
+  \bgroup%
+  \pgfkeys{%
+    /classycv/library/stylesheets/resume/leftpart/.cd%
+    , skip left/.get=\@@skipleft%
+    , skip below/.get=\@@skipbelow%
+    , skip right/.get=\@@skipright%
+    , skip above/.get=\@@skipabove%
+    , padding left/.get=\@@paddingleft%
+    , padding bottom/.get=\@@paddingbottom%
+    , padding right/.get=\@@paddingright%
+    , padding top/.get=\@@paddingtop%
+    , parskip/.get=\@@parskip%
+    , parskip/.get=\@@parindent%
+    , text color/.get=\@@textcolor%
+    , font family/.get=\@@fontfamily%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+    , font size/.get=\@@fontsize%
+    , background color/.get=\@@backgroundcolor%
+  }%
+  \adjustboxset{}%
+  \ifnum\pdf@strcmp{\@@backgroundcolor}{none}=\z@\else\adjustboxset{bgcolor=\@@backgroundcolor}\fi%
+  \begin{adjustbox}{
+    , minipage=[][\textheight][t]{\textwidth-\@@skipleft-\@@skipright-\@@paddingleft-\@@paddingright}
+    , margin={\@@skipleft} {\@@skipbelow} {\@@skipright} {\@@skipabove}
+    , padding={\@@paddingleft} {\@@paddingbottom} {\@@paddingright} {\@@paddingtop}
+  }%
+    \applystyle{parskip}{\@@parskip}%
+    \applystyle{parindent}{\@@parindent}%
+    \applystyle{font family}{\@@fontfamily}%
+    \applystyle{font series}{\@@fontseries}%
+    \applystyle{font shape}{\@@fontshape}%
+    \applystyle{font size}{\@@fontsize}%
+    \applystyle{text color}{\@@textcolor}%
+    \IfFileExists{classycv--resume-leftpart.tex}{%
+      \input{classycv--resume-leftpart}%
+    }{%
+      \PackageWarning{classycvresumethemetwocolumn}{Input file ``classycv--resume-leftpart.tex'' not found}{}%
+    }%
+  \end{adjustbox}%
+  \egroup%
+}
+
+\declarestylesheet[%
+  parskip=\the\baselineskip%
+  , parindent=0pt%
+]{/resume/rightpart}
+
+\newcommand{\@classycv@resume@rightpart}{%
+  \bgroup%
+  \pgfkeys{%
+    /classycv/library/stylesheets/resume/rightpart/.cd%
+    , skip left/.get=\@@skipleft%
+    , skip below/.get=\@@skipbelow%
+    , skip right/.get=\@@skipright%
+    , skip above/.get=\@@skipabove%
+    , padding left/.get=\@@paddingleft%
+    , padding bottom/.get=\@@paddingbottom%
+    , padding right/.get=\@@paddingright%
+    , padding top/.get=\@@paddingtop%
+    , parskip/.get=\@@parskip%
+    , parskip/.get=\@@parindent%
+    , text color/.get=\@@textcolor%
+    , font family/.get=\@@fontfamily%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+    , font size/.get=\@@fontsize%
+    , background color/.get=\@@backgroundcolor%
+  }%
+  \adjustboxset{}%
+  \ifnum\pdf@strcmp{\@@backgroundcolor}{none}=\z@\else\adjustboxset{bgcolor=\@@backgroundcolor}\fi%
+  \adjustbox{
+    stack=tl
+    , margin={\@@skipleft} {\@@skipbelow} {\@@skipright} {\@@skipabove}
+    , padding={\@@paddingleft} {\@@paddingbottom} {\@@paddingright} {\@@paddingtop}
+  }{%
+    \applystyle{parskip}{\@@parskip}%
+    \applystyle{parindent}{\@@parindent}%
+    \applystyle{font family}{\@@fontfamily}%
+    \applystyle{font series}{\@@fontseries}%
+    \applystyle{font shape}{\@@fontshape}%
+    \applystyle{font size}{\@@fontsize}%
+    \applystyle{text color}{\@@textcolor}%
+    \IfFileExists{classycv--resume-rightpart.tex}{%
+      \input{classycv--resume-rightpart}%
+    }{%
+      \PackageWarning{classycvresumethemetwocolumn}{Input file ``classycv--resume-rightpart.tex'' not found}{}%
+    }%%
+  }%
+  % \par%
+  \egroup%
+}
+
+\declarestylesheet[%
+  padding left=2ex%
+  , padding right=2ex%
+  , padding top=0ex%
+  , padding bottom=0ex%
+  , parskip=\the\baselineskip%%
+  , parindent=0pt%
+]{/resume/block}
+
+\renewenvironment{@classycv@resume@block}{%
+  \bgroup%
+  \pgfkeys{%
+    /classycv/library/stylesheets/resume/block/.cd%
+    , skip left/.get=\@@skipleft%
+    , skip below/.get=\@@skipbelow%
+    , skip right/.get=\@@skipright%
+    , skip above/.get=\@@skipabove%
+    , padding left/.get=\@@paddingleft%
+    , padding bottom/.get=\@@paddingbottom%
+    , padding right/.get=\@@paddingright%
+    , padding top/.get=\@@paddingtop%
+    , parskip/.get=\@@parskip%
+    , parskip/.get=\@@parindent%
+    , text color/.get=\@@textcolor%
+    , font family/.get=\@@fontfamily%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+    , font size/.get=\@@fontsize%
+    , background color/.get=\@@backgroundcolor%
+  }%
+  \noindent%
+  \adjustboxset{}%
+  \ifnum\pdf@strcmp{\@@backgroundcolor}{none}=\z@\else\adjustboxset{bgcolor=\@@backgroundcolor}\fi
+  \begin{adjustbox}{%
+    minipage={\textwidth-\@@skipleft-\@@skipright-\@@paddingleft-\@@paddingright}
+    , margin={\@@skipleft} {\@@skipbelow} {\@@skipright} {\@@skipabove}
+    , padding={\@@paddingleft} {\@@paddingbottom} {\@@paddingright} {\@@paddingtop}
+  }
+    \applystyle{parskip}{\@@parskip}%
+    \applystyle{font family}{\@@fontfamily}%
+    \applystyle{font series}{\@@fontseries}%
+    \applystyle{font shape}{\@@fontshape}%
+    \applystyle{font size}{\@@fontsize}%
+    \applystyle{text color}{\@@textcolor}%
+}{%
+  \end{adjustbox}%
+  \egroup%
+}
+
+\declarestylesheet[%
+  font family=Roboto-LF%
+]{/resume/entry}
+
+\renewcommand{\@classycv@resume@entry}[4]{%
+  \bgroup%
+  \pgfkeys{%
+    /classycv/library/stylesheets/resume/entry/.cd
+    , padding top/.get=\@@paddingtop%
+    , padding right/.get=\@@paddingright%
+    , padding bottom/.get=\@@paddingbottom%
+    , padding left/.get=\@@paddingleft%
+    , skip above/.get=\@@skipabove%
+    , skip right/.get=\@@skipright%
+    , skip below/.get=\@@skipbelow%
+    , skip left/.get=\@@skipleft%
+    , parskip/.get=\@@parskip%
+    , parindent/.get=\@@parindent%
+    , text color/.get=\@@textcolor%
+    , font family/.get=\@@fontfamily%
+    , font size/.get=\@@fontsize%
+    , parskip/.get=\@@parskip%
+    , text color/.get=\@@textcolor%
+    , font family/.get=\@@fontfamily%
+    , font size/.get=\@@fontsize%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+  }%
+  \adjustbox{minipage={\textwidth-\@@skipleft-\@@skipright-\@@paddingleft-\@@paddingright}, margin={\@@skipleft} {\@@skipbelow} {\@@skipright} {\@@skipabove}, padding={\@@paddingleft} {\@@paddingbottom} {\@@paddingright} {\@@paddingtop}}{%
+    \applystyle{parskip}{\@@parskip}%
+    \applystyle{parindent}{\@@parindent}%
+    \applystyle{font family}{\@@fontfamily}%
+    \applystyle{font series}{\@@fontseries}%
+    \applystyle{font shape}{\@@fontshape}%
+    \applystyle{font size}{\@@fontsize}%
+    \applystyle{text color}{\@@textcolor}%
+    {\textbf{#1}}~\cdotfill~{\fontseries{l}\selectfont{#2}}\par%
+    {\fontseries{l}\itshape\selectfont{#3}}\hfill{\fontseries{l}\selectfont{#4}}%
+  }%
+  \egroup%
+  % \ignorespaces%
+}
+
+\declarestylesheet[%
+  % font family=Roboto-LF%
+  % , padding left=24pt%
+  % , padding right=24pt%
+]{/resume/entryline}
+
+\renewcommand{\@classycv@resume@entryline}[2]{%
+  \bgroup%
+  \pgfkeys{%
+    /classycv/library/stylesheets/resume/entryline/.cd
+    , padding top/.get=\@@paddingtop%
+    , padding right/.get=\@@paddingright%
+    , padding bottom/.get=\@@paddingbottom%
+    , padding left/.get=\@@paddingleft%
+    , skip above/.get=\@@skipabove%
+    , skip right/.get=\@@skipright%
+    , skip below/.get=\@@skipbelow%
+    , skip left/.get=\@@skipleft%
+    , text color/.get=\@@textcolor%
+    , font family/.get=\@@fontfamily%
+    , font size/.get=\@@fontsize%
+    , parskip/.get=\@@parskip%
+    , parindent/.get=\@@parindent%
+    , text color/.get=\@@textcolor%
+    , font family/.get=\@@fontfamily%
+    , font size/.get=\@@fontsize%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+  }%
+  \adjustbox{minipage={\textwidth-\@@skipleft-\@@skipright-\@@paddingleft-\@@paddingright}, margin={\@@skipleft} {\@@skipbelow} {\@@skipright} {\@@skipabove}, padding={\@@paddingleft} {\@@paddingbottom} {\@@paddingright} {\@@paddingtop}}{%
+    \applystyle{parskip}{\@@parskip}%
+    \applystyle{parindent}{\@@parindent}%
+    \applystyle{font family}{\@@fontfamily}%
+    \applystyle{font series}{\@@fontseries}%
+    \applystyle{font shape}{\@@fontshape}%
+    \applystyle{font size}{\@@fontsize}%
+    \applystyle{text color}{\@@textcolor}%
+    {\bfseries{#1}}~\cdotfill~{\fontseries{l}\selectfont{#2}}%
+  }%
+  \egroup%
+  \ignorespaces%
+}
+
+\declarestylesheet[%
+  parskip=0.1\baselineskip, 
+  , font family=fve%
+  , font size=Huge%
+  , text color=highlight-color%
+]{/resume/title}
+
+\newcommand{\@classycv@resume@title}[1]{%
+  \bgroup%
+  \pgfkeys{/classycv/submitter/name/.get=\name}%
+  \pgfkeys{%
+    /classycv/library/stylesheets/resume/title/.cd
+    , padding top/.get=\@@paddingtop%
+    , padding right/.get=\@@paddingright%
+    , padding bottom/.get=\@@paddingbottom%
+    , padding left/.get=\@@paddingleft%
+    , skip above/.get=\@@skipabove%
+    , skip right/.get=\@@skipright%
+    , skip below/.get=\@@skipbelow%
+    , skip left/.get=\@@skipleft%
+    , parindent/.get=\@@parindent%
+    , parskip/.get=\@@parskip%
+    , text color/.get=\@@textcolor%
+    , font family/.get=\@@fontfamily%
+    , font size/.get=\@@fontsize%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+    , background color/.get=\@@backgroundcolor%
+  }%
+  % \LetLtxMacro\line\@classycv@resume@title@line%
+  \applystyle{parindent}{\@@parindent}%
+  \adjustboxset{}
+  \ifnum\pdf@strcmp{\@@backgroundcolor}{none}=\z@\else\adjustboxset{bgcolor=\@@backgroundcolor}\fi%
+  \adjustbox{
+    minipage=[t][][s]{\textwidth-\@@skipleft-\@@skipright-\@@paddingleft-\@@paddingright}
+    , margin={\@@skipleft} {\@@skipbelow} {\@@skipright} {\@@skipabove}
+    , padding={\@@paddingleft} {\@@paddingbottom} {\@@paddingright} {\@@paddingtop}
+  }{%
+    \applystyle{parindent}{\@@parindent}%
+    \applystyle{parskip}{\@@parskip}%
+    \applystyle{font family}{\@@fontfamily}%
+    \applystyle{font series}{\@@fontseries}%
+    \applystyle{font shape}{\@@fontshape}%
+    \applystyle{font size}{\@@fontsize}%
+    \applystyle{text color}{\@@textcolor}%
+    #1%
+  }%
+  % \par%
+  \egroup%
+  \ignorespaces%
+}
+
+\newcommand{\@classycv@resume@portrait}[1]{%
+  \adjustimage{width=\textwidth}{#1}%
+}
+
+\makeatother
