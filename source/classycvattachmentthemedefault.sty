@@ -1,0 +1,93 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesClass{classycvthemeclassic}[2018/11/03 Default attachment format]
+
+\RequirePackage{pgfkeys}
+\RequirePackage{tikz}
+% Comment line below and uncomment line two below for layout debugging
+\RequirePackage[pass, margin=0pt]{geometry}
+% \RequirePackage[pass, margin=0pt, showframe]{geometry}
+\RequirePackage[pagestyles,explicit,compact]{titlesec}
+\RequirePackage{pdfpages}
+% \RequirePackage[draft]{pdfpages}
+
+%
+% Settings
+%
+
+\usetikzlibrary{positioning}
+\classycvuselibrary{colors}
+\classycvuselibrary{fonts}
+
+\makeatletter
+
+\newgeometry{%
+  includefoot%
+  , nomarginpar%
+	% Add up footer skip and footer height to properly space bottom of footer from bottom of content box.
+	, footskip=\dimexpr\baselineskip + 0.5in\relax%
+	, tmargin=0.5in%
+	, rmargin=0.5in%
+  , bmargin=0.1in%
+  % , bmargin=0pt%
+	, lmargin=0.5in%
+}
+\savegeometry{attachment}
+
+\newpagestyle{attachment}{%
+	% Remove header rule and footer rule.
+	\setheadrule{0pt}%
+	\setfootrule{0pt}%
+	\sethead{}{}{}%
+  \setfoot{%
+		\@classycv@attachment@footer%
+	}{}{}%
+}
+
+%
+% Components
+%
+
+\declarestylesheet[%
+  font family=lmr%
+]{/attachment}
+
+%%
+% Attachment environment
+%%
+\renewenvironment{attachment}[1]{%
+  \pgfkeys{/classycv/attachment/.cd, title={#1}}%%
+  \pgfkeys{%
+    /classycv/library/stylesheets/attachment/.cd%
+    , font family/.get=\@@fontfamily%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+    , font size/.get=\@@fontsize%
+    , text color/.get=\@@textcolor%
+  }%
+  \loadgeometry{attachment}%
+  \pagestyle{attachment}%
+  \applystyle{parskip}{0pt}%
+  \applystyle{parindent}{9pt}%
+  \applystyle{font family}{\@@fontfamily}%
+  \applystyle{font series}{\@@fontseries}%
+  \applystyle{font shape}{\@@fontshape}%
+  \applystyle{font size}{\@@fontsize}%
+  \applystyle{text color}{\@@textcolor}%
+  \clearpage%
+}{%
+  \restoregeometry%
+  \clearpage%
+}
+
+\renewcommand{\@classycv@attachment@footer}{%
+  \pgfkeys{/classycv/attachment/title/.get=\title}%
+  \tikz{%
+    \draw[draw=none, use as bounding box] (0, 0) rectangle (\textwidth, 0.5in);%
+    \draw[color=light-gray, line width=1pt] (0, \dimexpr0.53in - 1pt) -- (\textwidth, \dimexpr0.5in - 1pt);
+    \node[below=\baselineskip of current bounding box.north, inner sep=0pt, outer sep=0pt, minimum width=\textwidth, text width=\textwidth, text=medium-gray, font=\small\berafamily] {%
+      \title\hfill\thepage%
+    };%
+  }%
+}
+
+\makeatother
