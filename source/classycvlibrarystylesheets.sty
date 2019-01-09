@@ -1,0 +1,98 @@
+\ProvidesClass{classycvlibrarystylesheets}[2018/11/08 Stylesheet library for classycv]
+
+\RequirePackage{pgfkeys}
+\RequirePackage{pdftexcmds}
+
+\classycvuselibrary{colors}
+\classycvuselibrary{fonts}
+
+\makeatletter
+
+%%
+% #1: Initial style values.
+% #2: PGF keys path (must be prefixed with '/').
+%%
+% TODO code to expand padding into padding left, ..., padding top
+\newcommand{\declarestylesheet}[2][]{%
+  \pgfkeys{%
+    /classycv/library/stylesheets#2/.cd%
+    , width/.initial=\@empty%
+    , height/.initial=\@empty%
+    , skip above/.initial=0pt%
+    , skip right/.initial=0pt%
+    , skip below/.initial=0pt%
+    , skip left/.initial=0pt%
+    , padding/.initial=0pt%
+    , padding top/.initial=0pt%
+    , padding right/.initial=0pt%
+    , padding bottom/.initial=0pt%
+    , padding left/.initial=0pt%
+    % TODO code to set padding top, ... when setting this
+    , padding/.initial=0pt%
+    , border width/.initial=0pt%
+    , border color/.initial=none%
+    , parskip/.initial=0pt%
+    , parindent/.initial=0pt%
+    , text align/.initial=left%
+    , text size/.initial=inherit%
+    , text color/.initial=inherit%
+    , font family/.initial=inherit%
+    , font series/.initial=inherit%
+    , font shape/.initial=inherit%
+    , font size/.initial=inherit%
+    , background color/.initial=none%
+    , #1%
+  }%
+  \ignorespaces%
+}
+
+%%
+% #1: PGF keys path (must be prefixed with '/').
+% #2: Style values.
+%%
+\newcommand{\setstylesheet}[2]{%
+  \pgfkeys{/classycv/library/stylesheets#1/.cd, #2}%
+}
+
+%%
+% Apply a style value
+% 
+% #1: Style key
+% #2: Style value
+%%
+\newcommand{\applystyle}[2]{%
+  \ifnum\pdf@strcmp{inherit}{#2}=\z@%
+  \else%
+    \ifnum\pdf@strcmp{font family}{#1}=\z@%
+      \fontfamily{#2}\selectfont%
+    \else%
+      \ifnum\pdf@strcmp{font series}{#1}=\z@%
+        \fontseries{#2}\selectfont%
+      \else
+        \ifnum\pdf@strcmp{font shape}{#1}=\z@%
+          \fontshape{#2}\selectfont%%
+        \else
+          \ifnum\pdf@strcmp{font size}{#1}=\z@%
+            \csname#2\endcsname%
+          \else%
+            \ifnum\pdf@strcmp{text color}{#1}=\z@%
+              \expandafter\color\expandafter{#2}%
+            \else%
+              \ifnum\pdf@strcmp{parskip}{#1}=\z@%
+                \setlength{\parskip}{\dimexpr#2\relax}%
+              \else%
+                \ifnum\pdf@strcmp{parindent}{#1}=\z@%
+                  \setlength{\parindent}{\dimexpr#2\relax}%
+                \else%
+                  \PackageError{classycvlibrarystylesheets}{Unsuported style property: #1}{}%
+                \fi%
+              \fi%
+            \fi%
+          \fi%
+        \fi%
+      \fi%
+    \fi%
+  \fi%
+}
+
+\makeatother
