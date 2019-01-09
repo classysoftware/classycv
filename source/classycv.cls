@@ -19,7 +19,6 @@
   , zipcode/.initial=\@empty%
   , country/.initial=\@empty%
   , countrycode/.initial=\@empty%
-  , date/.initial=\today%
   , phone/.initial=\@empty%
   , email/.initial=\@empty%
   , website/.initial=\@empty%
@@ -37,14 +36,6 @@
   , zipcode/.initial=\@empty%
   , company/.initial=\@empty%
   , country/.initial=\@empty%
-}
-
-\pgfkeys{%
-  /classycv/coverletter/.cd%
-  , salutation/.initial=\@empty%
-  , closing/.initial=\@empty%
-  , date/.initial=\today%
-  , attachments/.initial=\@empty%
 }
 
 \pgfkeys{%
@@ -87,7 +78,7 @@
 %%
 % Cover letter environment
 %%%
-\newenvironment{coverletter}[3][]{%
+\newenvironment{coverletter}{%
 	\PackageError{classycv}{Please select a theme}{}
 }{%
 }
@@ -95,13 +86,13 @@
 %%
 % Resume environment
 %%
-\newenvironment{resume}[1][]{%
+\newenvironment{resume}{%
 	\PackageError{classycv}{Please select a theme}{}
 }{%
 }
 
 %%
-% Resume block environment
+% Local resume block environment
 %%
 \newenvironment{@classycv@resume@block}{%
   \PackageError{classycv}{Please select a theme}{}
@@ -109,20 +100,18 @@
 }
 
 %%
-% Resume entry command
+% Local resume entry command
 %%
 \newcommand{\@classycv@resume@entry}[4]{% 
   \PackageError{classycv}{Please select a theme}{}%
 }
 
-% %%
-% % Resume block entry environment
-% %%
-% \newenvironment{@classycv@resume@blockentry}[4]{%
-%   \PackageError{classycv}{Please select a theme}{}
-% }{%
-% }
-
+%%
+% Local resume entry line command
+%%
+\newcommand{\@classycv@resume@entryline}[4]{% 
+  \PackageError{classycv}{Please select a theme}{}%
+}
 
 %%
 % Attachment environment
@@ -133,10 +122,6 @@
 }
 
 \newcommand{\@classycv@attachment@footer}{%
-  \PackageError{classycv}{Please select a theme}{}
-}
-
-\newcommand{\pdfattachment}[3][]{%
   \PackageError{classycv}{Please select a theme}{}
 }
 
