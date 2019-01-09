@@ -98,6 +98,30 @@ TODO
 
 ## Appendix
 
+### Examples
+
+#### Harvard CV Example
+
+The following images show the first pages produced for the cover letter, resume, and attachments section of the **harvard theme** example cv in `examples/harvard/build/harvard.pdf`.
+
+> ![harvard cv example first cover letter page](./examples/harvard/cover-letter-first-page.png)
+>
+> ![harvard cv example first resume page](./examples/harvard/resume-first-page.png)
+>
+> ![harvard cv example first resume page](./examples/harvard/attachments-first-page.png)
+
+#### Modern CV Example
+
+The following images show the first pages produced for the cover letter, resume, and attachments section of the **modern theme** example cv in `examples/modern/build/harvard.pdf`.
+
+> ![modern cv example first cover letter page](./examples/modern/cover-letter-first-page.png)
+>
+> ![modern cv example first resume page](./examples/modern/resume.png)
+>
+> ![modern cv example first resume page](./examples/modern/attachments-first-page.png)
+
+### CV Stubs
+
 ### Harvard CV Stub
 
 ```tex
