@@ -1,0 +1,109 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesClass{classycvcoverletterthemegerman}[2018/11/03 Standard german cover letter format]
+
+% Extend american coverletter
+\classycvusetheme[coverletter]{american}
+
+\makeatletter
+
+\renewcommand{\@classycv@coverletter@header}{%
+  \bgroup%
+  \pgfkeys{%
+    /classycv/submitter/.cd%
+    , name/.get=\name%
+    , street/.get=\street%
+    , house/.get=\house%
+    , zipcode/.get=\zipcode%
+    , countrycode/.get=\countrycode%
+    , city/.get=\city%
+    , phone/.get=\phone%
+    , email/.get=\email%
+  }%
+  \setlength{\parskip}{0pt}%
+  \setlength{\parindent}{0pt}%
+  \tikz{%
+    \draw[draw=none, use as bounding box] (0, 0) rectangle (\textwidth, 0.5in);%
+    % \draw[draw=light-gray, line width=1pt] (0, 0) rectangle (\textwidth, 0);%
+    \node[inner sep=0pt, outer sep=0pt, text=accent-color, font=\berafamily\small] at (current bounding box.center) {%
+      \begin{tabularx}{\textwidth}{@{}X >{\centering\arraybackslash}X >{\raggedleft\arraybackslash}X@{}}%
+          \parbox[c]{\hsize}{%
+            \Large\name%
+          }%
+        &%
+          \parbox[c]{\hsize}{%
+            \centering%
+            \street, \house\\%
+            \city, \ifnum\pdf@strcmp{\countrycode}{\@empty}=\z@\else\countrycode-\fi\zipcode,%
+          }%
+        &%
+          \parbox[c]{\hsize}{%
+            \centering%
+            \phone\\%
+            \email%
+          }%
+      \end{tabularx}%
+    };%
+  }%
+  \egroup%
+}
+
+\renewcommand{\@classycv@coverletter@submitter}{%
+  \bgroup%
+  \pgfkeys{%
+    /classycv/submitter/.cd%
+    , name/.get=\name%
+    , street/.get=\street%
+    , house/.get=\house%
+    , city/.get=\city%
+    , zipcode/.get=\zipcode%
+    , country/.get=\country%
+  }%
+  \robotofamily\fontseries{l}\selectfont%
+  % \color{dark-gray}%
+  \setlength{\parskip}{0pt}%
+  \setlength{\parindent}{0pt}%
+  \name\par%
+  \street~\house\par%
+  \zipcode, \city\par%
+  \ifnum\pdf@strcmp{\country}{\@empty}=\z@\else\country\par\fi%
+  \ignorespaces%
+  \egroup%
+}
+
+\renewcommand{\@classycv@coverletter@recipient}{%
+  \bgroup%
+  \pgfkeys{%
+    /classycv/recipient/.cd%
+    , name/.get=\name%
+    , position/.get=\position%
+    , company/.get=\company%
+    , street/.get=\street%
+    , house/.get=\house%
+    , city/.get=\city%
+    , zipcode/.get=\zipcode%
+    , country/.get=\country%
+    , date/.get=\date%
+  }%
+  \pgfkeys{%
+    /classycv/library/stylesheets/coverletter/recipient/.cd%
+    , text color/.get=\@@textcolor
+    , font family/.get=\@@fontfamily%
+    , font size/.get=\@@fontsize%
+    , font shape/.get=\@@fontshape%
+  }%
+  \setlength{\parskip}{0pt}%
+  \setlength{\parindent}{0pt}%
+  \fontfamily{\@@fontfamily}\fontseries{\@@fontseries}\fontshape{\@@fontshape}\selectfont%
+  \expandafter\color\expandafter{\@@textcolor}%
+  \csname\@@fontsize\endcsname%
+  {\bfseries\name}\par%
+  \ifnum\pdf@strcmp{\position}{\@empty}=\z@\else\position\par\fi%
+  \ifnum\pdf@strcmp{\company}{\@empty}=\z@\else{\textit{\company}}\par\fi%
+  \street~\house\par%
+  \zipcode,~\city\par%
+  \ifnum\pdf@strcmp{\country}{\@empty}=\z@\else\country\par\fi%
+  \vspace*{\baselineskip}%
+  \egroup%
+}
+
+\makeatother
