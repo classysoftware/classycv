@@ -1,0 +1,419 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesClass{classycvcoverletterthemeamerican}[2018/11/03 Standard american cover letter format]
+
+\RequirePackage{pdftexcmds}
+\RequirePackage{pgfkeys}
+\RequirePackage{tikz}
+% Comment line below and uncomment line two below for layout debugging
+\RequirePackage[pass, margin=0pt]{geometry}
+% \RequirePackage[pass, margin=0pt, showframe]{geometry}
+\RequirePackage[pagestyles,explicit,compact]{titlesec}
+\RequirePackage{tabularx}
+\RequirePackage[hidelinks]{hyperref}
+
+%
+% Settings
+%
+
+\usetikzlibrary{positioning}
+\classycvuselibrary{colors}
+\classycvuselibrary{fonts}
+\classycvuselibrary{stylesheets}
+
+\makeatletter
+
+% Set page margins (see, https://resumegenius.com/how-to-write-a-resume/resume-fonts-margins-paper-guidelines)
+\newgeometry{%
+	includeheadfoot%
+	, nomarginpar%
+	, headheight=0.5in%
+	, headsep=2\baselineskip%
+	% Add up footer skip and footer height to properly space bottom of footer from bottom of content box.
+	, footskip=\dimexpr\baselineskip + 0.5in\relax%
+	, tmargin=1in%
+	, rmargin=1in%
+	, bmargin=1in%
+	, lmargin=1in%
+}
+\savegeometry{coverletter}
+
+\newpagestyle{coverletter}{%
+	\setheadrule{0pt}%
+	\setfootrule{0pt}%
+  \sethead{%
+    \@classycv@coverletter@header%
+	}{}{}%
+	\setfoot{%
+		\@classycv@coverletter@footer%
+  }{}{}%
+  \setlength{\parskip}{\baselineskip}%
+  \setlength{\parindent}{12pt}%
+}
+
+%
+% Components
+%
+
+\declarestylesheet[%
+  parskip=\the\baselineskip%
+  , parindent=15pt%
+  , font family=fve%
+  , font series=l%
+]{/coverletter}
+
+%%
+% Cover letter environment
+%%
+\renewenvironment{coverletter}{%
+  \bgroup%
+  % \pgfkeys{%
+  %   /classycv/coverletter/.cd%
+  %   % , salutation={#2}%
+  %   % , closing={#3}%
+  %   , #1%
+  % }%
+  \pgfkeys{%
+    /classycv/library/stylesheets/coverletter/.cd%
+    , parskip/.get=\@@parskip%
+    , parindent/.get=\@@parindent%
+    , font family/.get=\@@fontfamily%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+  }%
+  \loadgeometry{coverletter}%
+  \pagestyle{coverletter}%
+  \clearpage%
+  \LetLtxMacro\printSubmitter\@classycv@coverletter@submitter%
+  \LetLtxMacro\printDate\@classycv@coverletter@date%
+  \LetLtxMacro\printRecipient\@classycv@coverletter@recipient%
+  \LetLtxMacro\printSalutation\@classycv@coverletter@salutation%
+  \LetLtxMacro\printClosing\@classycv@coverletter@closing%
+  \LetLtxMacro\printAttachments\@classycv@coverletter@attachments
+  % \@classycv@coverletter@submitter%
+  % \par\vspace*{\baselineskip}\@classycv@coverletter@date%
+  % \par\vspace*{\baselineskip}\@classycv@coverletter@recipient%
+  % \par\vspace*{\baselineskip}\@classycv@coverletter@salutation%
+  \setlength{\parskip}{\@@parskip}%
+  \setlength{\parindent}{\@@parindent}%
+  \fontfamily{\@@fontfamily}\fontseries{\@@fontseries}\fontshape{\@@fontshape}\selectfont%
+}{%
+  % \par\vspace*{\@@parskip}%
+  % \@classycv@coverletter@closing%
+  % \@classycv@coverletter@attachments%
+  \restoregeometry%
+  \clearpage%
+  \newpage%
+  \egroup%
+}
+
+\declarestylesheet[%
+  text color=highlight-color%
+  , font family=fve%
+  , font size=small%
+]{/coverletter/header}
+
+\newcommand{\@classycv@coverletter@header}{%
+  \pgfkeys{%
+    /classycv/submitter/.cd%
+    , name/.get=\name%
+    , street/.get=\street%
+    , house/.get=\house%
+    , zipcode/.get=\zipcode%
+    , countrycode/.get=\countrycode%
+    , city/.get=\city%
+    , phone/.get=\phone%
+    , email/.get=\email%
+  }%
+  \pgfkeys{%
+    /classycv/library/stylesheets/coverletter/header/.cd%
+    , text color/.get=\@@textcolor
+    , font family/.get=\@@fontfamily%
+    , font size/.get=\@@fontsize%
+  }%
+  \setlength{\parskip}{0pt}%
+  \setlength{\parindent}{0pt}%
+  \tikz{%
+    \draw[draw=none, use as bounding box] (0, 0) rectangle (\textwidth, 0.5in);%
+    % \draw[draw=light-gray, line width=1pt] (0, 0) rectangle (\textwidth, 0);%
+    \node[inner sep=0pt, outer sep=0pt] at (current bounding box.center) {%
+      \applystyle{text color}{\@@textcolor}%
+      \applystyle{font size}{\@@fontsize}
+      \applystyle{font family}{\@@fontfamily}%
+      \begin{tabularx}{\textwidth}{@{}X >{\centering\arraybackslash}X >{\raggedleft\arraybackslash}X@{}}%
+          \parbox[c]{\hsize}{%
+            \Large\name%
+          }%
+        &%
+          \parbox[c]{\hsize}{%
+            \centering%
+            \house~\street\\%
+            \city, \ifnum\pdf@strcmp{\countrycode}{\@empty}=\z@\else\countrycode-\fi\zipcode%
+          }%
+        &%
+          \parbox[c]{\hsize}{%
+            \centering%
+            \phone\\%
+            \href{mailto:\email}{\email}%
+          }%
+      \end{tabularx}%
+    };%
+  }%
+}
+
+\declarestylesheet[%
+  font family=fve%
+  , font size=small%
+]{/coverletter/footer}
+
+\newcommand{\@classycv@coverletter@footer}{%
+  \pgfkeys{%
+    /classycv/library/stylesheets/coverletter/footer/.cd%
+    , text color/.get=\@@textcolor
+    , font family/.get=\@@fontfamily%
+    , font size/.get=\@@fontsize%
+    , font shape/.get=\@@fontshape%
+  }%
+  \tikz{%
+    \draw[draw=none, use as bounding box] (0, 0) rectangle (\textwidth, 0.5in);
+    \draw[color=light-gray, line width=1pt] (0, \dimexpr0.5in - 1pt) -- (\textwidth, \dimexpr0.5in - 1pt);
+    \node[below=\baselineskip of current bounding box.north, inner sep=0pt, outer sep=0pt, text width=\textwidth] {%
+      \bgroup%
+      \applystyle{text color}{\@@textcolor}%
+      \applystyle{font size}{\@@fontsize}
+      \applystyle{font family}{\@@fontfamily}%
+      \hfill\thepage%
+      \egroup%
+    };%
+  }%
+}
+
+\declarestylesheet[%
+  font family=Roboto-LF%
+  , skip above=0pt%
+  , skip below=\baselineskip%
+  % , text color=foreground-color%
+]{/coverletter/submitter}
+
+\newcommand{\@classycv@coverletter@submitter}{%
+  \bgroup%
+  \pgfkeys{%
+    /classycv/submitter/.cd%
+    , name/.get=\name%
+    , street/.get=\street%
+    , house/.get=\house%
+    , city/.get=\city%
+    , zipcode/.get=\zipcode%
+    , country/.get=\country%
+  }%
+  \pgfkeys{%
+    /classycv/library/stylesheets/coverletter/submitter/.cd%
+    , skip above/.get=\@@skipabove%
+    , skip below/.get=\@@skipbelow%
+    , parskip/.get=\@@parskip%
+    , parindent/.get=\@@parindent%
+    , text color/.get=\@@textcolor
+    , font family/.get=\@@fontfamily%
+    , font size/.get=\@@fontsize%
+    , font shape/.get=\@@fontshape%
+  }%
+  \applystyle{parskip}{\@@parskip}%
+  \applystyle{parindent}{\@@parindent}
+  \par\vspace*{\@@skipabove}%
+  \applystyle{font family}{\@@fontfamily}%
+  \applystyle{font series}{\@@fontseries}%
+  \applystyle{font shape}{\@@fontshape}%
+  \applystyle{text color}{\@@textcolor}%
+  \applystyle{font size}{\@@fontsize}%
+  \name\par%
+  \house~\street\par%
+  \city,~\zipcode\par%
+  \ifnum\pdf@strcmp{\country}{\@empty}=\z@\else\country\par\fi%
+  \par\vspace*{\@@skipbelow}%
+  \egroup%
+  \ignorespaces%
+}
+
+\declarestylesheet[%
+  font family=Roboto-LF%
+  , skip above=0pt%
+  , skip below=\baselineskip%
+]{/coverletter/date}
+
+\newcommand{\@classycv@coverletter@date}[1]{%
+  \bgroup%
+  \pgfkeys{%
+    /classycv/library/stylesheets/coverletter/date/.cd%
+    , skip above/.get=\@@skipabove
+    , parskip/.get=\@@parskip%
+    , parindent/.get=\@@parindent%
+    , font size/.get=\@@fontsize%
+    , font family/.get=\@@fontfamily%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+    , text color/.get=\@@textcolor
+  }%
+  \applystyle{parskip}{\@@parskip}%
+  \applystyle{parindent}{\@@parindent}
+  \par\vspace*{\@@skipabove}%
+  \applystyle{font size}{\@@fontsize}%
+  \applystyle{font family}{\@@fontfamily}%
+  \applystyle{font series}{\@@fontseries}%
+  \applystyle{font shape}{\@@fontshape}%
+  \applystyle{text color}{\@@textcolor}%
+  {#1}%
+  \par\vspace*{\baselineskip}%
+  \egroup%
+}
+
+\declarestylesheet[%
+  font family=Roboto-LF%
+  , skip above=0pt%
+  , skip below=\baselineskip%
+]{/coverletter/recipient}
+
+\newcommand{\@classycv@coverletter@recipient}{%
+  \bgroup%
+  \pgfkeys{%
+    /classycv/recipient/.cd%
+    , name/.get=\name%
+    , position/.get=\position%
+    , company/.get=\company%
+    , street/.get=\street%
+    , house/.get=\house%
+    , city/.get=\city%
+    , zipcode/.get=\zipcode%
+    , country/.get=\country%
+    , date/.get=\date%
+  }%
+  \pgfkeys{%
+    /classycv/library/stylesheets/coverletter/recipient/.cd%
+    , skip above/.get=\@@skipabove
+    , skip below/.get=\@@skipbelow
+    , parskip/.get=\@@parskip%
+    , parindent/.get=\@@parindent%
+    , text color/.get=\@@textcolor
+    , font family/.get=\@@fontfamily%
+    , font size/.get=\@@fontsize%
+    , font shape/.get=\@@fontshape%
+  }%
+  \applystyle{parskip}{\@@parskip}%
+  \applystyle{parindent}{\@@parindent}
+  \par\vspace*{\@@skipabove}%
+  \applystyle{font size}{\@@fontsize}%
+  \applystyle{font family}{\@@fontfamily}%
+  \applystyle{font series}{\@@fontseries}%
+  \applystyle{font shape}{\@@fontshape}%
+  \applystyle{text color}{\@@textcolor}%
+  {\bfseries\name}\par%
+  \ifnum\pdf@strcmp{\position}{\@empty}=\z@\else\position\par\fi%
+  \ifnum\pdf@strcmp{\company}{\@empty}=\z@\else{\textit{\company}}\par\fi%
+  \house~\street\par%
+  \city,~\zipcode\par%
+  \ifnum\pdf@strcmp{\country}{\@empty}=\z@\else\country\par\fi%
+  \vspace*{\@@skipbelow}%
+  \egroup%
+}
+
+\declarestylesheet[%
+  font family=fve%
+  , skip below=0pt%
+]{/coverletter/salutation}
+
+\newcommand{\@classycv@coverletter@salutation}[1]{%
+  \bgroup%
+  \pgfkeys{%
+    /classycv/library/stylesheets/coverletter/salutation/.cd%
+    , skip above/.get=\@@skipabove%
+    , skip below/.get=\@@skipbelow%
+    , parskip/.get=\@@parskip%
+    , parindent/.get=\@@parindent%
+    , text color/.get=\@@textcolor%
+    , font size/.get=\@@fontsize%
+    , font family/.get=\@@fontfamily%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+  }%
+  \applystyle{parskip}{\@@parskip}%
+  \applystyle{parindent}{\@@parindent}
+  \par\vspace*{\@@skipabove}%
+  \applystyle{font size}{\@@fontsize}%
+  \applystyle{font family}{\@@fontfamily}%
+  \applystyle{font series}{\@@fontseries}%
+  \applystyle{font shape}{\@@fontshape}%
+  \applystyle{text color}{\@@textcolor}%
+  {#1}%
+  \par\vspace*{\@@skipbelow}%
+  \egroup%
+}
+
+\declarestylesheet[%
+    skip above=\the\baselineskip%
+    , font family=fve%
+]{/coverletter/closing}
+
+\newcommand{\@classycv@coverletter@closing}[1]{%
+  \bgroup%
+  \pgfkeys{
+    /classycv/submitter/.cd%
+    , name/.get=\name%
+  }%
+  \pgfkeys{
+    /classycv/library/stylesheets/coverletter/closing/.cd%
+    , skip above/.get=\@@skipabove%
+    , skip below/.get=\@@skipbelow%
+    , parskip/.get=\@@parskip%
+    , parindent/.get=\@@parindent%
+    , text color/.get=\@@textcolor%
+    , font size/.get=\@@fontsize%
+    , font family/.get=\@@fontfamily%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+  }%
+  \applystyle{parskip}{\@@parskip}%
+  \applystyle{parindent}{\@@parindent}
+  \par\vspace*{\@@skipabove}%
+  \applystyle{font size}{\@@fontsize}%
+  \applystyle{font family}{\@@fontfamily}%
+  \applystyle{font series}{\@@fontseries}%
+  \applystyle{font shape}{\@@fontshape}%
+  \applystyle{text color}{\@@textcolor}%
+  {#1}\\[3\baselineskip]\name\par%
+  \egroup%
+}
+
+\declarestylesheet[%
+    text color=dark-gray%
+    , font family=fve%
+    , font series=m%
+    , font shape=it%
+]{/coverletter/attachments}
+
+\newcommand{\@classycv@coverletter@attachments}[1]{%
+  \bgroup%
+  \pgfkeys{%
+    /classycv/library/stylesheets/coverletter/attachments/.cd%
+    , skip above/.get=\@@skipabove%
+    , skip below/.get=\@@skipbelow%
+    , parskip/.get=\@@parskip%
+    , parindent/.get=\@@parindent%
+    , text color/.get=\@@textcolor%
+    , font size/.get=\@@fontsize%
+    , font family/.get=\@@fontfamily%
+    , font series/.get=\@@fontseries%
+    , font shape/.get=\@@fontshape%
+  }%
+  \applystyle{parskip}{\@@parskip}%
+  \applystyle{parindent}{\@@parindent}
+  \par\vfill{%
+    \applystyle{font size}{\@@fontsize}%
+    \applystyle{font family}{\@@fontfamily}%
+    \applystyle{font series}{\@@fontseries}%
+    \applystyle{font shape}{\@@fontshape}%
+    \applystyle{text color}{\@@textcolor}%
+    {#1}%
+  }%
+  \egroup%
+  \ignorespaces%
+}
+
+\makeatother
