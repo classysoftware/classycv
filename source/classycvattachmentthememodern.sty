@@ -1,0 +1,100 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesClass{classycvattachmentthememodern}[2018/11/03 Default attachment format]
+
+\RequirePackage{pgfkeys}
+\RequirePackage{tikz}
+\RequirePackage[pass, margin=0pt]{geometry}
+\RequirePackage[pagestyles,explicit,compact]{titlesec}
+\RequirePackage{pdfpages}
+% \RequirePackage[draft]{pdfpages}
+
+%
+% Settings
+%
+\usetikzlibrary{positioning}
+\classycvuselibrary{colors}
+\classycvuselibrary{fonts}
+\classycvuselibrary{stylesheets}
+
+\makeatletter
+
+\newpagestyle{attachment}{%
+	% Remove header rule and footer rule.
+	\setheadrule{0pt}%
+	\setfootrule{0pt}%
+	\sethead{}{}{}%
+	\setfoot{%
+    \@classycv@attachment@footer%
+	}{}{}%
+}
+
+\newgeometry{%
+	includefoot%
+	, nomarginpar%
+	, headheight=0pt%
+	, headsep=0pt%
+  , foot=0pt%
+  % Add footer height and footer skip
+  % , footskip=\dimexpr15mm + 5mm\relax%
+	, tmargin=0pt%
+	, rmargin=0pt%
+	, bmargin=0pt%
+	, lmargin=0pt%
+	, width=\the\paperwidth%
+	, height=\the\paperheight%
+}
+\savegeometry{attachment}
+
+%%
+% Attachment environment
+%%
+\renewenvironment{attachment}[1]{%
+  \pgfkeys{/classycv/attachment/.cd, title={#1}}%
+  \loadgeometry{attachment}%
+  \pagestyle{attachment}%
+  \setlength{\parskip}{0pt}%
+  \setlength{\parindent}{0pt}%
+  \clearpage%
+}{%
+  \restoregeometry%
+  \clearpage%
+}
+
+\declarestylesheet[%
+  background color=nearly-black%
+  , text color=white%
+  , font size=small%
+  , font series=m%
+  , font family=fve%
+  , skip left=24pt%
+  , skip right=24pt%
+]{/attachment/footer}
+
+\renewcommand{\@classycv@attachment@footer}{%
+  \pgfkeys{/classycv/attachment/title/.get=\title}%
+  \pgfkeys{%
+    /classycv/library/stylesheets/attachment/footer/.cd%
+    , background color/.get=\@@backgroundcolor%
+    , text color/.get=\@@textcolor%
+    , font family/.get=\@@fontfamily%
+    , font size/.get=\@@fontsize%
+    , font series/.get=\@@fontseries%
+    , skip left/.get=\@@skipleft%
+    , skip right/.get=\@@skipright%
+  }%
+  \tikz[overlay, remember picture]{%
+    \coordinate (A) at (0, 15mm);
+    \draw[draw=none, fill=\@@backgroundcolor, opacity=0.75, use as bounding box] (0, 0) rectangle (\paperwidth, 15mm);%
+    \node[draw=none, inner sep=0pt, outer sep=0pt, below right=0pt and 0pt of A, minimum width=\paperwidth, minimum height=9mm, text width=\dimexpr\paperwidth-\@@skipleft-\@@skipright\relax, text height=9mm, text depth=6mm]%
+      at (A) {%
+      \applystyle{font family}{\@@fontfamily}%
+      \applystyle{font series}{\@@fontseries}%
+      \applystyle{font size}{\@@fontsize}%
+      \applystyle{text color}{\@@textcolor}%
+      \title\hfill\thepage%
+    };%
+  }%
+  \ignorespaces%
+}
+
+\makeatother
