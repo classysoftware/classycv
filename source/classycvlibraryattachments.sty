@@ -1,0 +1,44 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesClass{classycvlibraryattachments}[2018/11/02 Attachment library for classycv]
+
+\RequirePackage{tikz}
+\RequirePackage{pgfkeys}
+\RequirePackage{pdftexcmds}
+\RequirePackage{adjustbox}
+\RequirePackage{pgf}
+
+\makeatletter
+
+\newlength{\@classycv@library@attachments@lI}
+\newcount\@classycv@library@attachments@cI
+
+\newcommand{\blindattachment}[2][]{%
+  \bgroup%
+  \begin{attachment}{#2}
+      \setlength{\parindent}{0pt}%
+      \setlength{\parskip}{0pt}%
+      \pgfmathsetmacro{\@@ratio}{(210mm/297mm)*\the\textheight}%
+      \setlength\@classycv@library@attachments@lI{\dimexpr\@@ratio pt}%
+      \pgfmathsetmacro{\@@offsetx}{(\the\textwidth-\the\@classycv@library@attachments@lI)/2}%
+      \hspace*{\dimexpr\@@offsetx pt\relax}%
+      \tikz{%
+          \draw[draw=none, fill=gray, use as bounding box] rectangle (\@classycv@library@attachments@lI, \textheight);
+          \draw[white, line width=5pt] ([xshift=-5pt, yshift=5pt]current bounding box.north west) -- ([xshift=5pt, yshift=-5pt]current bounding box.south east);
+          \draw[white, line width=5pt] ([xshift=-5pt, yshift=-5pt]current bounding box.south west) -- ([xshift=5pt, yshift=5pt]current bounding box.north east);
+          \node[scale=10, inner sep=6pt, outer sep=0pt, fill=gray, text=white] at (current bounding box.center) {#1};
+      }%
+  \end{attachment}%
+  \egroup%
+  \ignorespaces%
+}
+
+\newcommand{\pdfattachment}[3][]{%
+  \bgroup%
+  \begin{attachment}{#2}%
+    \includepdf[pages={1-}, pagecommand={\pagestyle{attachment}}, width=\textwidth, keepaspectratio, #1]{#3}%
+  \end{attachment}%
+  \egroup%
+  \ignorespaces%
+}
+
+\makeatother
