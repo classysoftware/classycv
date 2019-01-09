@@ -1,0 +1,195 @@
+\documentclass[a4paper, 12pt]{classycv}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[pangram]{blindtext}
+
+\classycvusetheme{harvard}
+\classycvuselibrary{attachments}
+\classycvuselibrary{drawings}
+\classycvuselibrary{icons}
+
+\palette{blue}%
+
+\submitter{%
+    , name=Peter Peterson%,
+    , street=Rightward Way%
+    , house=134 %
+    , city=Portland%
+    , zipcode=04019%
+    , country=United States%
+    , countrycode=USA%
+    , phone=774-987-4009%
+    , email=peter.peterson@harvard.edu%
+    , website=myspace.com/peterpeterson%
+}
+
+\recipient{%
+    name=Carol Corporate%
+    , position=Head of human resources%
+    , company=Evil Corp.%
+    , street=Copernoll Hollow Dr.%
+    , house=1%
+    , city=Bosstown%
+    , zipcode=WI 53581%
+    , country=USA%
+}
+
+\begin{document}
+
+%
+% Cover letter
+%
+
+\begin{coverletter}
+    \printSubmitter%
+    \printDate{\today}%
+    \printRecipient%
+    \printSalutation{Dear Ms. Corporate:}%
+    \Blindtext[2][10]
+    \Blindtext[3][8]
+    \printClosing{Best regards,}
+    \printAttachments{Attachments: A, B}
+\end{coverletter}
+%
+% Resume
+%
+\begin{resume}
+    %
+    % Education
+    %
+    \vspace*{-4\baselineskip}
+    \section{\MakeUppercase{Education}}
+    \entry{Ph.D. in Social Anthropology}{Expected May 2017}{Harvard University}{Cambridge, MA}
+    
+    \begin{block}
+        Secondary Field in Science, Technology and Society. Awarded Presidential Scholar Award in 2016.
+
+        \Blindtext[2][5]
+    \end{block}
+    
+    \entry{B.A. in Anthropology with Highest Honors}{May 2013}{University of California}{Berkeley Berkeley, CA}
+
+    \begin{block}
+        Minors in Japanese and American Studies. Phi Beta Kappa. Awarded 2011 National Undergrad- uate Paper Prize.
+    \end{block}
+        
+    \entry{Coursework in Japanese, Gender Studies, and Cultural Studies}{Sept 2011 - July 2012}{University of Tokyo}{Tokyo, Japan}
+
+    %
+    % Higher Education Experience
+    %
+    \section{\MakeUppercase{Higher Education Experience}}
+
+    \entry{Office of Admissions Graduate Admissions Associate}{ Sept 2015 - Present}{Harvard University}{Cambridge, MA}
+
+    \begin{itemize}
+        \item Supported recruitment and outreach efforts, including Diversity Recruitment Program, 1 open house, 2 information sessions, and 2 interview days (for doctoral applicant finalists).
+        \item Researched and contacted 27 new marketing opportunities to advertise graduate programs.
+        \item Prepared comparative marketing report on higher education recruitment and outreach strategies for Assistant Director and Director of Admissions.
+        \item Analyzed trends in applicant survey data to improve future recruitment and outreach efforts.
+        \item Pre-screened 400+ graduate program applications.
+        \item Evaluated 8 applications in mock admissions review session held by Assistant Directors.
+        \item Provided assistance to 100+ prospective graduate students on application process.
+        \item Aided Assistant Directors with research projects and administrative tasks.
+    \end{itemize}
+
+    \entry{Teaching Fellow}{Sept 2016 - Present}{Harvard University}{Cambridge, MA}
+
+    \begin{itemize}
+        \item Taught and facilitated 4 tutorial sections for undergraduates in medical anthropology, en- vironmental policy, and gender studies.
+        \item Advised 60 students on course material, research design, and extracurricular opportuni- ties.
+        \item Received excellent student evaluation scores that surpassed course benchmarks for teach- ing quality (4.67/5, with course benchmark of 4.07; and 4.47/5, with course benchmark of 4.17).
+        \item Assisted faculty with administrative tasks and curriculum development.
+    \end{itemize}
+
+    \entry{Political Ecology Working Group}{Program Coordinator Sept 2015 - Present}{Harvard University}{Cambridge, MA}
+
+    \begin{itemize}
+        \item Planned and implemented workshop program (14 workshop sessions per academic year).
+        \item Facilitated introduction of speakers and discussion during workshop sessions.
+        \item Trained incoming coordinator to assist with program, budget, and recruitment.
+        \item Managed annual budget of \$3,000.
+        \item Developed and launched recruitment campaign (increased membership by 500 and increased membership diversity by 4 academic disciplines and 2 university affiliations).
+        \item Organized, executed, and fundraised \$1,600 for graduate student conference (90 attendees).
+    \end{itemize}
+
+    \entry{Department of East Asian Languages and Civilizations}{Senior Tutor Aug 2015 - Present}{Harvard University}{Cambridge, MA}
+
+    \begin{itemize}
+        \item Advised 2 undergraduates on senior theses concerning East Asia, and edited thesis drafts. 
+        \item Evaluated and assigned grades for theses while serving as member of faculty committee.
+    \end{itemize}
+
+    %
+    % Higher Education Experience
+    %
+    \section{\MakeUppercase{Additional Experience}}
+
+    \entry{Contributing Editor}{Dec 2016 - Present}{Cultural Anthropology (Journal)}{}
+    
+    \begin{itemize}
+        \item Developed content for and strategized branding of journal through social media activities (Twitter, Facebook) as part of Social Media Team.
+        \item Analyzed data (Google Analytics) to improve site content and increase site traffic.
+        \item Edited 4 articles submitted to journal.
+    \end{itemize}
+
+    \entry{Research and Outreach Program Assistant}{July 2011 - July 2011, Jan 2013 - Aug 2013}{University of California Berkeley}{Berkeley, CA}
+
+    \begin{itemize}
+        \item Supported faculty with molecular ecology experiments and administrative tasks.
+        \item Facilitated public education and outreach efforts, such as Biotechnology Outreach Program (21 events on 4 islands) and Genius Day Program for elementary students (4 events).
+    \end{itemize}
+
+    \entry{Director of Members and Honorary Members}{Aug 2011 - May 2013}{Golden Key International Honor Society}{Berkeley, CA}
+
+    \begin{itemize}
+        \item Planned and managed 18 volunteer opportunities, 2 blood drives, and 4 award ceremonies.
+        \item Supervised 10 undergraduate volunteers at each event.
+        \item Trained 2 incoming directors to use student and alumni database.
+        \item Analyzed attendee data to improve structure and content of future award ceremonies.
+        \item Coordinated high-profile alumni and honorary member participation at events (e.g. famous local comedian and local singer) for entertainment at 2 award ceremonies.
+    \end{itemize}
+
+    \entry{Student Health Advisory Council}{Chair (2010-2011) and Vice Chair (2009-2010)}{Berkeley, CA}{Aug 2011 - May 2013}
+
+    \begin{itemize}
+        \item Advocated for student interests on key university health policies and services, in particular on-campus HIV/AIDS testing and affordable health insurance.
+        \item Chaired and facilitated Council meetings to discuss agenda and university health policy.
+        \item Trained incoming Chair to plan, execute, evaluate, and lead Council events and meetings.
+        \item Collected and summarized student survey data to identify and prioritize healthcare needs.
+        \item Planned Council activities and managed 4+ members during events (e.g. blood drive).
+    \end{itemize}
+
+    %
+    % Skills
+    %
+    \section{\MakeUppercase{Skills}}
+
+    \begin{tabular}[\textwidth]{rp{0.7\textwidth-1\tabcolsep}}
+        \alert{Computer} & Macintosh and Windows operating systems, Microsoft Office, Adobe Photoshop, Blackboard, and Technolutions Slate (student database system).
+        \\\alert{Language} & Fluent in Japanese. Traveled extensively in Asia.
+    \end{tabular}
+
+    %
+    % Publications and Conference Presentations
+    %
+    \section{\MakeUppercase{Publications and Conference Presentations}}
+
+    \begin{tabular}[\textwidth]{rp{0.6\textwidth-1\tabcolsep}}
+        \alert{Publications} & 4 refereed journal articles and 2 book chapters.
+        \\\alert{Conference Presentations} & 8 refereed conference papers at national conferences.
+        \\\alert{Invited Lectures} & 2 invited lectures at universities in Japan and Australia.
+    \end{tabular}
+\end{resume}
+
+%
+% Attachments
+%
+
+\pdfattachment{Attachment A}{../assets/attachment.pdf}
+\blindattachment[B1]{Attachment B}
+\blindattachment[B2]{Attachment B}
+
+\end{document}
